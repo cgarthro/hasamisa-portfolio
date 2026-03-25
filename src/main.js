@@ -263,77 +263,210 @@ function animateMoths() {
 }
 animateMoths();
 
+// 1.5 Dynamic JSON Gallery Loader
+async function loadDynamicGallery() {
+  const track = document.getElementById('json-gallery-track');
+  if (!track) return;
+  
+  try {
+    const response = await fetch('/data.json');
+    if (!response.ok) throw new Error('Could not fetch data.json');
+    
+    const projects = await response.json();
+
+    const isVideo = (path) => {
+      if (!path) return false;
+      const ext = path.split('.').pop().toLowerCase();
+      return ['mp4', 'webm', 'ogg', 'mov'].includes(ext);
+    };
+
+    const renderMedia = (src, className = '', alt = '') => {
+      if (isVideo(src)) {
+        return `<video class="${className}" src="${src}" autoplay loop muted playsinline loading="lazy"></video>`;
+      }
+      return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
+    };
+    
+    projects.forEach(proj => {
+      const card = document.createElement('div');
+      card.className = 'project-showcase glass-card dynamic-card';
+      // Pass the aspect ratio to CSS so widths variably adjust!
+      card.style.setProperty('--card-ratio', proj.aspectRatio || '16/9');
+
+      const hasLink = !!proj.link;
+      if (hasLink) card.dataset.link = proj.link;
+      
+      const iconHtml = hasLink 
+        ? `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`
+        : `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
+
+      if (proj.beforeImage) {
+        card.innerHTML = `
+          ${iconHtml}
+          <h3>${proj.title}</h3>
+          <div class="comparison-slider" 
+               ${proj.hdBeforeImage ? `data-hd-before="${proj.hdBeforeImage}"` : ''}
+               ${proj.hdImage ? `data-hd-after="${proj.hdImage}"` : ''}>
+            <div class="before-image">${renderMedia(proj.beforeImage, '', 'Before')}</div>
+            <div class="after-image">${renderMedia(proj.image, '', 'Final')}</div>
+            <div class="slider-handle"></div>
+          </div>
+        `;
+      } else {
+        card.innerHTML = `
+          ${iconHtml}
+          <h3>${proj.title}</h3>
+          <div class="media-container" ${proj.hdImage ? `data-hd="${proj.hdImage}"` : ''}>
+            ${renderMedia(proj.image, `ambient-img ${proj.animation || ''}`, proj.title)}
+          </div>
+        `;
+      }
+      
+      track.appendChild(card);
+    });
+
+    // Re-bind hover cursors for the new dynamic cards
+    const hoverElements = track.querySelectorAll('.project-showcase');
+    const cursor = document.querySelector('.custom-cursor');
+    hoverElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (cursor) cursor.classList.add('hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        if (cursor) cursor.classList.remove('hover');
+      });
+    });
+
+    // Re-bind 3D Spatial depth array so newly injected cards get the 3D scroll effect
+    cards3D = document.querySelectorAll('.glass-card, .project-showcase, .skill-card');
+
+    // Re-bind newly injected comparison sliders
+    if (typeof bindSliders === 'function') bindSliders(track);
+    if (typeof bindLightbox === 'function') bindLightbox(track);
+
+  } catch (error) {
+    console.error('JSON Load Error:', error);
+  }
+}
+document.addEventListener('DOMContentLoaded', loadDynamicGallery);
+
 // 2. Horizontal Scroll Logic for Multiple Galleries
 const gallerySections = document.querySelectorAll('.gallery-section');
+
+function updateGalleryDimensions() {
+  gallerySections.forEach(section => {
+    const track = section.querySelector('.gallery-track');
+    if (!track) return;
+    
+    // Dynamic 1:1 scroll speed: Track width dictates section scroll height
+    const trackWidth = track.scrollWidth;
+    // adding innerHeight ensures we have enough scroll distance to fully view it at a natural 1:1 speed
+    section.style.height = `${trackWidth + window.innerHeight}px`;
+  });
+}
+
+// Call on load and resize
+window.addEventListener('load', updateGalleryDimensions);
+window.addEventListener('resize', updateGalleryDimensions);
+// Also call immediately after dynamic injection
+document.addEventListener('DOMContentLoaded', () => setTimeout(updateGalleryDimensions, 500)); 
 
 window.addEventListener('scroll', () => {
   gallerySections.forEach(section => {
     const sticky = section.querySelector('.gallery-sticky-container');
     const track = section.querySelector('.gallery-track');
-    if (!sticky || !track) return;
+    if (!sticky || !track || track.children.length === 0) return;
 
     const sectionRect = section.getBoundingClientRect();
     const sectionHeight = section.offsetHeight;
     const viewportHeight = window.innerHeight;
 
+    // Calculate progress (0 to 1) perfectly inside the sticky container bound
     const scrollProgress = -sectionRect.top / (sectionHeight - viewportHeight);
     const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
 
-    const totalTrackScroll = track.scrollWidth - window.innerWidth;
-    track.style.transform = `translateX(-${clampedProgress * totalTrackScroll}px)`;
+    // Calculate exact start and end transforms to perfectly center the first and last cards
+    const firstCard = track.firstElementChild;
+    const lastCard = track.lastElementChild;
+    
+    // Starting offset: pushes the first card's center to the window's center
+    const startTranslateX = (window.innerWidth / 2) - (firstCard.offsetLeft + (firstCard.offsetWidth / 2));
+    
+    // Ending offset: pushes the last card's center to the window's center
+    const endTranslateX = (window.innerWidth / 2) - (lastCard.offsetLeft + (lastCard.offsetWidth / 2));
+    
+    // Interpolate
+    const currentTranslateX = startTranslateX + (clampedProgress * (endTranslateX - startTranslateX));
+    
+    track.style.transform = `translateX(${currentTranslateX}px)`;
   });
 }, { passive: true });
 
 // 3. Image Comparison Slider Logic
-const sliders = document.querySelectorAll('.comparison-slider');
+function bindSliders(scope = document) {
+  const sliders = scope.querySelectorAll('.comparison-slider:not(.bound)');
 
-sliders.forEach(slider => {
-  const afterImage = slider.querySelector('.after-image');
-  const innerImg = slider.querySelector('.after-image img');
-  const sliderHandle = slider.querySelector('.slider-handle');
+  sliders.forEach(slider => {
+    slider.classList.add('bound');
+    const afterImage = slider.querySelector('.after-image');
+    const innerImg = slider.querySelector('.after-image img, .after-image video');
+    const sliderHandle = slider.querySelector('.slider-handle');
 
-  let isSliding = false;
+    let isSliding = false;
 
-  const syncImageWidth = () => {
-    const rect = slider.getBoundingClientRect();
-    innerImg.style.width = `${rect.width}px`;
-  };
+    const syncImageWidth = () => {
+      innerImg.style.width = `${slider.clientWidth}px`;
+      innerImg.style.height = `${slider.clientHeight}px`;
+      
+      const beforeImg = slider.querySelector('.before-image img, .before-image video');
+      if (beforeImg) {
+        beforeImg.style.width = `${slider.clientWidth}px`;
+        beforeImg.style.height = `${slider.clientHeight}px`;
+      }
+    };
 
-  window.addEventListener('resize', syncImageWidth);
-  setTimeout(syncImageWidth, 100);
+    window.addEventListener('resize', syncImageWidth);
+    setTimeout(syncImageWidth, 100);
+    setTimeout(syncImageWidth, 350); // After Lightbox 0.3s CSS opacity transition
+    
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => syncImageWidth()).observe(slider);
+    }
 
-  const moveSlider = (x) => {
-    const rect = slider.getBoundingClientRect();
-    let position = x - rect.left;
+    const moveSlider = (x) => {
+      const rect = slider.getBoundingClientRect();
+      let position = x - rect.left;
 
-    if (position < 0) position = 0;
-    if (position > rect.width) position = rect.width;
+      if (position < 0) position = 0;
+      if (position > rect.width) position = rect.width;
 
-    const percentage = (position / rect.width) * 100;
+      const percentage = (position / rect.width) * 100;
 
-    afterImage.style.width = `${percentage}%`;
-    sliderHandle.style.left = `${percentage}%`;
-  };
+      afterImage.style.width = `${percentage}%`;
+      sliderHandle.style.left = `${percentage}%`;
+    };
 
-  slider.addEventListener('mousedown', (e) => { isSliding = true; moveSlider(e.clientX); });
-  window.addEventListener('mouseup', () => { isSliding = false; });
-  window.addEventListener('mousemove', (e) => {
-    if (!isSliding) return;
-    moveSlider(e.clientX);
+    sliderHandle.addEventListener('mousedown', (e) => { isSliding = true; moveSlider(e.clientX); });
+    window.addEventListener('mouseup', () => { isSliding = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (!isSliding) return;
+      moveSlider(e.clientX);
+    });
+
+    sliderHandle.addEventListener('touchstart', (e) => { isSliding = true; moveSlider(e.touches[0].clientX); });
+    window.addEventListener('touchend', () => { isSliding = false; });
+    window.addEventListener('touchmove', (e) => {
+      if (!isSliding) return;
+      moveSlider(e.touches[0].clientX);
+    }, { passive: true });
+
+    window.addEventListener('scroll', syncImageWidth, { passive: true });
   });
-
-  slider.addEventListener('touchstart', (e) => { isSliding = true; moveSlider(e.touches[0].clientX); });
-  window.addEventListener('touchend', () => { isSliding = false; });
-  window.addEventListener('touchmove', (e) => {
-    if (!isSliding) return;
-    moveSlider(e.touches[0].clientX);
-  }, { passive: true });
-
-  window.addEventListener('scroll', syncImageWidth, { passive: true });
-});
+}
+bindSliders(document);
 
 // 4. 3D Spatial Depth Engine for Cards (Scroll Driven)
-const cards3D = document.querySelectorAll('.glass-card, .project-showcase, .skill-card');
+let cards3D = document.querySelectorAll('.glass-card, .project-showcase, .skill-card');
 
 function update3DScroll() {
   const windowCenterX = window.innerWidth / 2;
@@ -388,3 +521,125 @@ tiltCards.forEach(card => {
     card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
   });
 });
+
+// 6. Anti-Save & Right-Click Prevention Global
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('dragstart', e => {
+  if (e.target.nodeName.toUpperCase() === 'IMG') {
+    e.preventDefault();
+  }
+});
+
+// 7. Lightbox and Routing System
+function initLightbox() {
+  const modal = document.createElement('div');
+  modal.id = 'lightbox-modal';
+  modal.innerHTML = `
+    <div class="lightbox-close">&times;</div>
+    <div class="lightbox-content"></div>
+  `;
+  document.body.appendChild(modal);
+
+  const closeBtn = modal.querySelector('.lightbox-close');
+  const content = modal.querySelector('.lightbox-content');
+
+  const closeLightbox = () => {
+    modal.classList.remove('active');
+    setTimeout(() => { content.innerHTML = ''; }, 300);
+  };
+
+  closeBtn.addEventListener('click', closeLightbox);
+  
+  let modalDownX = 0, modalDownY = 0;
+  modal.addEventListener('mousedown', (e) => {
+    modalDownX = e.clientX;
+    modalDownY = e.clientY;
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target !== modal) return;
+    if (Math.abs(e.clientX - modalDownX) > 5 || Math.abs(e.clientY - modalDownY) > 5) return;
+    closeLightbox();
+  });
+
+  window.bindLightbox = (scope = document) => {
+    const cards = scope.querySelectorAll('.project-showcase:not(.lightbox-bound)');
+    cards.forEach(card => {
+      card.classList.add('lightbox-bound');
+
+      let startX = 0;
+      let startY = 0;
+
+      card.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+
+      card.addEventListener('click', (e) => {
+        // Prevent click if mouse dragged more than 5 pixels
+        if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) return;
+
+        // Ignore clicks on handles
+        if (e.target.closest('.slider-handle')) return;
+
+        // Routing Logic
+        if (card.dataset.link) {
+          window.location.href = card.dataset.link;
+          return;
+        }
+
+        // Lightbox Expansion
+        content.innerHTML = ''; 
+
+        const slider = card.querySelector('.comparison-slider');
+        if (slider) {
+          const clonedSlider = slider.cloneNode(true);
+          clonedSlider.classList.remove('bound');
+          
+          const ratio = card.style.getPropertyValue('--card-ratio');
+          if (ratio) clonedSlider.style.setProperty('--card-ratio', ratio);
+          
+          if (slider.dataset.hdBefore) {
+            const beforeMedia = clonedSlider.querySelector('.before-image img, .before-image video');
+            if (beforeMedia) beforeMedia.src = slider.dataset.hdBefore;
+          }
+          if (slider.dataset.hdAfter) {
+            const afterMedia = clonedSlider.querySelector('.after-image img, .after-image video');
+            if (afterMedia) afterMedia.src = slider.dataset.hdAfter;
+          }
+
+          content.appendChild(clonedSlider);
+          if (typeof bindSliders === 'function') bindSliders(modal);
+        } else {
+          const mediaContainer = card.querySelector('.media-container');
+          if (!mediaContainer) return;
+          let media = mediaContainer.querySelector('img, video');
+          if (!media) return;
+          
+          const clonedMedia = media.cloneNode(true);
+          clonedMedia.className = '';
+          
+          if (mediaContainer.dataset.hd) {
+            clonedMedia.src = mediaContainer.dataset.hd;
+          }
+          content.appendChild(clonedMedia);
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Lock scroll
+      });
+    });
+  };
+
+  bindLightbox(document);
+  
+  // Custom observer to release scroll lock when closing
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (!modal.classList.contains('active')) {
+        document.body.style.overflow = '';
+      }
+    });
+  });
+  observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+}
+document.addEventListener('DOMContentLoaded', initLightbox);

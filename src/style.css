@@ -26,6 +26,13 @@ body {
   color: var(--text-main);
   overflow-x: hidden;
   position: relative;
+  
+  /* Anti-Save / Anti-Select */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 body,
@@ -41,7 +48,7 @@ input {
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 999999;
   transform: translate(-50%, -50%);
 }
 
@@ -118,7 +125,7 @@ input {
 }
 
 #moth-canvas-front {
-  z-index: 9997; /* Above all page content */
+  z-index: 999998; /* Above lightbox modal (99999) */
 }
 
 /* Utility / Typography */
@@ -444,6 +451,13 @@ input {
   padding: 2rem;
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   transform-style: preserve-3d;
+  position: relative;
+}
+
+/* Variable width modifier for JSON-loaded cards */
+.project-showcase.dynamic-card {
+  width: auto;
+  max-width: 90vw; /* cap on mobile */
 }
 
 .project-showcase h3 {
@@ -466,7 +480,8 @@ input {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
 }
 
-.comparison-slider img {
+.comparison-slider img,
+.comparison-slider video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -492,7 +507,8 @@ input {
   box-shadow: 3px 0 15px rgba(12, 174, 185, 0.5);
 }
 
-.after-image img {
+.after-image img,
+.after-image video {
   max-width: none;
 }
 
@@ -510,7 +526,8 @@ input {
   justify-content: center;
   align-items: center;
   box-shadow: 0 0 20px var(--cyan-glow);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: ew-resize;
   z-index: 10;
   backdrop-filter: blur(5px);
 }
@@ -542,6 +559,17 @@ input {
   overflow: hidden;
   border: 1px solid var(--glass-border);
   position: relative;
+}
+
+/* Override for JSON cards supporting custom heights/widths */
+.project-showcase.dynamic-card .media-container,
+.project-showcase.dynamic-card .comparison-slider {
+  width: auto;
+  height: 45vh;
+  min-height: 250px;
+  max-height: 550px;
+  aspect-ratio: var(--card-ratio, 16/9); /* allows 9/16, 1/1, etc. */
+  margin: 0 auto;
 }
 
 .ambient-img,
@@ -877,5 +905,110 @@ footer {
   .social-icon {
     padding: 0.5rem 0.8rem;
     font-size: 0.75rem;
+  }
+}
+
+/* --- LIGHTBOX MODAL --- */
+#lightbox-modal {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 5, 8, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#lightbox-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-content {
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-content > img, 
+.lightbox-content > video {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 0 40px var(--cyan-glow);
+  object-fit: contain;
+}
+
+.lightbox-content > .comparison-slider {
+  height: 90vh;
+  max-width: 90vw;
+  width: auto;
+  aspect-ratio: var(--card-ratio, 16/9);
+  border-radius: 8px;
+  box-shadow: 0 0 40px var(--cyan-glow);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 30px; right: 40px;
+  width: 50px; height: 50px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 3rem;
+  color: var(--cyan-light);
+  cursor: none;
+  transition: transform 0.2s, text-shadow 0.2s;
+  z-index: 100;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.2) rotate(90deg);
+  text-shadow: 0 0 15px var(--cyan-light);
+}
+
+/* --- CARD HOVER ICONS --- */
+.card-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 12, 16, 0.8);
+  border: 1px solid var(--cyan-dark);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--cyan-light);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 20;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.project-showcase:hover .card-icon {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 15px var(--cyan-glow);
+}
+
+/* Mobile Icon Visibility */
+@media (max-width: 768px) {
+  .card-icon {
+    opacity: 1;
+    transform: scale(1);
+    background: rgba(0, 12, 16, 0.9);
   }
 }
