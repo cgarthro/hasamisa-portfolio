@@ -58,27 +58,56 @@ input {
   filter: drop-shadow(0 0 8px rgba(17, 164, 212, 0.8)) drop-shadow(0 0 20px rgba(17, 164, 212, 0.4));
 }
 
-.cursor-square {
+.cursor-lens {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 50px;
-  height: 50px;
+  width: 90px;
+  height: 90px;
   transform: translate(-50%, -50%);
-  border: 2px solid var(--cyan-light);
-  border-radius: 4px;
-  backdrop-filter: hue-rotate(90deg) saturate(150%) brightness(1.2);
-  -webkit-backdrop-filter: hue-rotate(90deg) saturate(150%) brightness(1.2);
+  border-radius: 35%; /* Squircle shape matching the WebGL superellipse */
+    
   opacity: 0;
   transition: opacity 0.3s;
-  animation: cursor-spin 4s linear infinite;
+  animation: cursor-spin 6s linear infinite; /* Smooth, continuous rotation */
 }
 
-/* On hover: hide lantern, show rotating square */
+/* Distortion Layer (Bottom) */
+.cursor-lens::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  
+  /* Edge distortion smoothed with a subtle blur */
+  backdrop-filter: blur(4px) url(#glass-distortion);
+  -webkit-backdrop-filter: blur(4px) url(#glass-distortion);
+  
+  /* Clear center, distorted edges mask, fading before it hits the border */
+  mask-image: radial-gradient(circle closest-side, transparent 40%, black 85%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 40%, black 85%, transparent 100%);
+  
+  z-index: 1;
+}
+
+/* Crisp Glowing Border Layer (Top) */
+.cursor-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--cyan-light); /* 50% thinner as requested */
+  box-shadow: 
+    0 0 15px var(--cyan-glow),
+    inset 0 0 15px var(--cyan-glow);
+  z-index: 2; /* Ensures it renders strictly over the distortion */
+}
+
+/* On hover: hide lantern, show rotating lens */
 .custom-cursor.hover .cursor-lantern {
   opacity: 0;
 }
-.custom-cursor.hover .cursor-square {
+.custom-cursor.hover .cursor-lens {
   opacity: 1;
 }
 
@@ -362,11 +391,10 @@ input {
   line-height: 1.6;
 }
 
-.social-links {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  margin-bottom: 3.5rem;
+.liquidGlass-wrapper.dock-wrapper {
+  margin: 0 auto 3.5rem auto;
+  width: fit-content;
+  border-radius: 4rem;
 }
 
 .social-icon {
@@ -386,7 +414,6 @@ input {
   box-shadow: 0 0 15px var(--cyan-glow);
   transform: translateY(-3px);
   cursor: none;
-  /* Let js custom cursor handle it */
 }
 
 /* Horizontal Scroll Gallery Section */
@@ -564,10 +591,9 @@ input {
 /* Override for JSON cards supporting custom heights/widths */
 .project-showcase.dynamic-card .media-container,
 .project-showcase.dynamic-card .comparison-slider {
-  width: auto;
-  height: 45vh;
-  min-height: 250px;
-  max-height: 550px;
+  max-width: 100%;
+  height: auto;
+  max-height: 45vh;
   aspect-ratio: var(--card-ratio, 16/9); /* allows 9/16, 1/1, etc. */
   margin: 0 auto;
 }
@@ -929,8 +955,9 @@ footer {
 }
 
 .lightbox-content {
-  width: 90vw;
-  height: 90vh;
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -938,32 +965,59 @@ footer {
 
 .lightbox-content > img, 
 .lightbox-content > video {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 95vw;
+  max-height: 95vh;
+  width: auto;
+  height: auto;
   border-radius: 8px;
   box-shadow: 0 0 40px var(--cyan-glow);
   object-fit: contain;
 }
 
 .lightbox-content > .comparison-slider {
-  height: 90vh;
-  max-width: 90vw;
-  width: auto;
+  width: 95vw;
+  height: auto;
+  max-width: 95vw;
+  max-height: 95vh;
   aspect-ratio: var(--card-ratio, 16/9);
   border-radius: 8px;
   box-shadow: 0 0 40px var(--cyan-glow);
 }
 
+/* --- HD IMAGE PROGRESSIVE LOADER --- */
+.hd-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 243, 255, 0.2);
+  border-top-color: var(--cyan-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 50;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 .lightbox-close {
   position: absolute;
-  top: 30px; right: 40px;
-  width: 50px; height: 50px;
+  top: 10px; right: 10px;
+  width: 40px; height: 40px;
   display: flex; justify-content: center; align-items: center;
-  font-size: 3rem;
-  color: var(--cyan-light);
+  font-size: 2.5rem;
+  color: #fff;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
   cursor: none;
-  transition: transform 0.2s, text-shadow 0.2s;
+  transition: transform 0.2s, background 0.2s;
   z-index: 100;
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--cyan-dark);
 }
 
 .lightbox-close:hover {
@@ -1010,5 +1064,165 @@ footer {
     opacity: 1;
     transform: scale(1);
     background: rgba(0, 12, 16, 0.9);
+    box-shadow: 0 0 15px var(--cyan-glow);
   }
 }
+/* --- LIQUID GLASS EFFECT (ORIGINAL REPRODUCTION) --- */
+.liquidGlass-wrapper {
+  position: relative;
+  display: flex;
+  font-weight: 600;
+  overflow: hidden;
+  color: white;
+  cursor: none; /* Custom cursor handle */
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.liquidGlass-effect {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  filter: url(#glass-distortion);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquidGlass-tint {
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 174, 185, 0.15); /* Cyan theme tint */
+}
+
+.liquidGlass-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 1px 0 rgba(72, 229, 239, 0.3),
+    inset -1px -1px 1px 1px rgba(12, 174, 185, 0.2);
+}
+
+.liquidGlass-effect,
+.liquidGlass-tint,
+.liquidGlass-shine {
+  border-radius: inherit;
+}
+
+.liquidGlass-text {
+  z-index: 3;
+  position: relative;
+}
+
+/* Menu Specific from user code */
+.menu,
+.menu > div {
+  padding: 0.4rem;
+  border-radius: 1.8rem;
+}
+
+.menu:hover {
+  padding: 0.6rem;
+  border-radius: 1.8rem;
+}
+
+.menu > div > div {
+  font-size: 20px;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.8rem;
+  transition: all 0.1s ease-in;
+}
+
+.menu > div > div:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: inset -2px -2px 2px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2px);
+}
+
+/* Dock Specific from user code */
+.dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  border-radius: 4rem;
+  padding: 0.8rem 2.5rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.dock,
+.dock > div {
+  border-radius: 4rem;
+}
+
+.dock:hover {
+  padding: 1rem 3rem;
+  border-radius: 4rem;
+}
+
+.dock:hover > div {
+  border-radius: 4rem;
+}
+
+.dock svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+}
+
+.dock img, .dock a {
+  width: auto;
+  height: auto;
+  padding: 10px;
+  color: var(--text-dim);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock img:hover, .dock a:hover {
+  transform: scale(1.5); /* Mac-style magnification */
+  color: var(--cyan-light);
+  transform-origin: center center;
+}
+
+/* Button Specific from user code */
+.button {
+  padding: 1.5rem 2.5rem;
+  border-radius: 3rem;
+}
+
+.button,
+.button > div {
+  border-radius: 3rem;
+}
+
+.button:hover {
+  padding: 1.8rem 2.8rem;
+}
+
+.button:hover > div {
+  border-radius: 4rem;
+}
+
+.button svg {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.button:hover svg {
+  transform: scale(0.95);
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1500%;
+  }
+}
+

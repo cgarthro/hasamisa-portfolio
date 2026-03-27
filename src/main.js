@@ -53,9 +53,9 @@ const createCursor = () => {
     </svg>`;
   cursor.appendChild(lantern);
 
-  // The hover square element (hidden by default)
+  // The hover lens element (hidden by default)
   const square = document.createElement('div');
-  square.classList.add('cursor-square');
+  square.classList.add('cursor-lens');
   cursor.appendChild(square);
 
   document.body.appendChild(cursor);
@@ -344,11 +344,54 @@ async function loadDynamicGallery() {
     if (typeof bindSliders === 'function') bindSliders(track);
     if (typeof bindLightbox === 'function') bindLightbox(track);
 
+    // Apply strict mathematical geometry limits to prevent mobile CSS squishing
+    if (typeof calculateCardDimensions === 'function') calculateCardDimensions();
+    if (typeof updateGalleryDimensions === 'function') setTimeout(updateGalleryDimensions, 100);
+
   } catch (error) {
     console.error('JSON Load Error:', error);
   }
 }
 document.addEventListener('DOMContentLoaded', loadDynamicGallery);
+
+// Force mathematical bounds on Dynamic Gallery cards so aspect ratio never distorts!
+window.calculateCardDimensions = () => {
+  const cards = document.querySelectorAll('.project-showcase.dynamic-card');
+  
+  // The outer card is 90vw max. We MUST subtract its 4rem (64px) horizontal padding 
+  // so the inner media box doesn't burst out of the glass boundary on narrow screens!
+  const maxW = (window.innerWidth * 0.90) - 64; 
+  const targetH = window.innerHeight * 0.45;
+
+  cards.forEach(card => {
+    const ratioStr = card.style.getPropertyValue('--card-ratio') || '16/9';
+    let [rw, rh] = ratioStr.split('/').map(Number);
+    if (!rw || !rh) { rw = 16; rh = 9; }
+    const ratio = rw / rh;
+
+    let h = targetH;
+    let w = h * ratio;
+
+    // If calculated width is too wide for screen, shrink the height proportionally!
+    if (w > maxW) {
+      w = maxW;
+      h = w / ratio;
+    }
+
+    const boxes = card.querySelectorAll('.media-container, .comparison-slider');
+    boxes.forEach(box => {
+      box.style.width = `${Math.floor(w)}px`;
+      box.style.height = `${Math.floor(h)}px`;
+      box.style.maxWidth = 'none';
+      box.style.maxHeight = 'none';
+      box.style.aspectRatio = 'auto'; // Disable CSS
+    });
+  });
+};
+
+window.addEventListener('resize', () => { 
+  if (typeof calculateCardDimensions === 'function') calculateCardDimensions(); 
+});
 
 // 2. Horizontal Scroll Logic for Multiple Galleries
 const gallerySections = document.querySelectorAll('.gallery-section');
@@ -535,8 +578,9 @@ function initLightbox() {
   const modal = document.createElement('div');
   modal.id = 'lightbox-modal';
   modal.innerHTML = `
-    <div class="lightbox-close">&times;</div>
-    <div class="lightbox-content"></div>
+    <div class="lightbox-content">
+      <div class="lightbox-close">&times;</div>
+    </div>
   `;
   document.body.appendChild(modal);
 
@@ -545,7 +589,11 @@ function initLightbox() {
 
   const closeLightbox = () => {
     modal.classList.remove('active');
-    setTimeout(() => { content.innerHTML = ''; }, 300);
+    setTimeout(() => {
+      Array.from(content.children).forEach(child => {
+        if (!child.classList.contains('lightbox-close')) child.remove();
+      });
+    }, 300);
   };
 
   closeBtn.addEventListener('click', closeLightbox);
@@ -588,23 +636,75 @@ function initLightbox() {
         }
 
         // Lightbox Expansion
-        content.innerHTML = ''; 
+        // We only clear the media elements, not the close button
+        Array.from(content.children).forEach(child => {
+          if (!child.classList.contains('lightbox-close')) child.remove();
+        }); 
 
         const slider = card.querySelector('.comparison-slider');
         if (slider) {
           const clonedSlider = slider.cloneNode(true);
           clonedSlider.classList.remove('bound');
           
-          const ratio = card.style.getPropertyValue('--card-ratio');
-          if (ratio) clonedSlider.style.setProperty('--card-ratio', ratio);
+          const ratioStr = card.style.getPropertyValue('--card-ratio') || '16/9';
+          let [rw, rh] = ratioStr.split('/').map(Number);
+          if (!rw || !rh) { rw = 16; rh = 9; }
+          const ratio = rw / rh;
           
+          let w = window.innerWidth * 0.95;
+          let h = w / ratio;
+          
+          const maxH = window.innerHeight * 0.95;
+          if (h > maxH) {
+            h = maxH;
+            w = h * ratio;
+          }
+          
+          clonedSlider.style.width = `${Math.floor(w)}px`;
+          clonedSlider.style.height = `${Math.floor(h)}px`;
+          clonedSlider.style.maxWidth = 'none';
+          clonedSlider.style.maxHeight = 'none';
+          clonedSlider.style.aspectRatio = 'auto'; // Disable CSS
+
           if (slider.dataset.hdBefore) {
-            const beforeMedia = clonedSlider.querySelector('.before-image img, .before-image video');
-            if (beforeMedia) beforeMedia.src = slider.dataset.hdBefore;
+            const beforeMedia = clonedSlider.querySelector('.before-image img');
+            if (beforeMedia) {
+              const loader = document.createElement('div');
+              loader.className = 'hd-loader';
+              clonedSlider.querySelector('.before-image').appendChild(loader);
+              
+              const loadHdBefore = () => {
+                const hdImg = new Image();
+                hdImg.onload = () => {
+                  beforeMedia.src = hdImg.src;
+                  loader.remove();
+                };
+                hdImg.src = slider.dataset.hdBefore;
+              };
+              
+              if (beforeMedia.complete) loadHdBefore();
+              else { beforeMedia.onload = loadHdBefore; beforeMedia.onerror = loadHdBefore; }
+            }
           }
           if (slider.dataset.hdAfter) {
-            const afterMedia = clonedSlider.querySelector('.after-image img, .after-image video');
-            if (afterMedia) afterMedia.src = slider.dataset.hdAfter;
+            const afterMedia = clonedSlider.querySelector('.after-image img');
+            if (afterMedia) {
+              const loader = document.createElement('div');
+              loader.className = 'hd-loader';
+              clonedSlider.querySelector('.after-image').appendChild(loader);
+              
+              const loadHdAfter = () => {
+                const hdImg = new Image();
+                hdImg.onload = () => {
+                  afterMedia.src = hdImg.src;
+                  loader.remove();
+                };
+                hdImg.src = slider.dataset.hdAfter;
+              };
+              
+              if (afterMedia.complete) loadHdAfter();
+              else { afterMedia.onload = loadHdAfter; afterMedia.onerror = loadHdAfter; }
+            }
           }
 
           content.appendChild(clonedSlider);
@@ -618,8 +718,27 @@ function initLightbox() {
           const clonedMedia = media.cloneNode(true);
           clonedMedia.className = '';
           
+          // HD Image swapping with Progressive Loading
           if (mediaContainer.dataset.hd) {
-            clonedMedia.src = mediaContainer.dataset.hd;
+            if (clonedMedia.tagName.toLowerCase() === 'img') {
+              const loader = document.createElement('div');
+              loader.className = 'hd-loader';
+              content.appendChild(loader); // Append loader to content, it will be removed after image loads
+              
+              const loadHd = () => {
+                const hdImg = new Image();
+                hdImg.onload = () => {
+                  clonedMedia.src = hdImg.src;
+                  loader.remove();
+                };
+                hdImg.src = mediaContainer.dataset.hd;
+              };
+              
+              if (clonedMedia.complete) loadHd();
+              else { clonedMedia.onload = loadHd; clonedMedia.onerror = loadHd; }
+            } else if (clonedMedia.tagName.toLowerCase() === 'video') {
+              clonedMedia.src = mediaContainer.dataset.hd;
+            }
           }
           content.appendChild(clonedMedia);
         }

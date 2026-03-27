@@ -6,5 +6,5 @@ echo    Starting Hasamisa Portfolio locally
 echo    The website will automatically open...
 echo =========================================
 echo.
-call npm run dev -- --open
+call npm run dev 
 pause

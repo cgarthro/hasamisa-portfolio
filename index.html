@@ -60,27 +60,34 @@
         <p class="hero-desc">Versatile polymath & self-taught 3D Artist specializing in modeling, shading, and technical
           art.</p>
 
-        <div class="social-links">
-          <a href="https://www.instagram.com/cgarthr0" target="_blank" class="social-icon" aria-label="Instagram">
-            <svg width="24" height="24" fill="currentColor">
-              <use xlink:href="#icon-instagram"></use>
-            </svg>
-          </a>
-          <a href="https://www.youtube.com/@Arthr0" target="_blank" class="social-icon" aria-label="YouTube">
-            <svg width="24" height="24" fill="currentColor">
-              <use xlink:href="#icon-youtube"></use>
-            </svg>
-          </a>
-          <a href="https://www.artstation.com/arthr0" target="_blank" class="social-icon" aria-label="ArtStation">
-            <svg width="24" height="24" fill="currentColor">
-              <use xlink:href="#icon-artstation"></use>
-            </svg>
-          </a>
-          <a href="mailto:cgarthro@gmail.com" class="social-icon" aria-label="Email">
-            <svg width="24" height="24" fill="currentColor">
-              <use xlink:href="#icon-email"></use>
-            </svg>
-          </a>
+        <div class="liquidGlass-wrapper dock-wrapper">
+          <div class="liquidGlass-effect"></div>
+          <div class="liquidGlass-tint"></div>
+          <div class="liquidGlass-shine"></div>
+          <div class="liquidGlass-text">
+            <div class="dock">
+              <a href="https://www.instagram.com/cgarthr0" target="_blank" aria-label="Instagram">
+                <svg width="24" height="24" fill="currentColor">
+                  <use xlink:href="#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://www.youtube.com/@Arthr0" target="_blank" aria-label="YouTube">
+                <svg width="24" height="24" fill="currentColor">
+                  <use xlink:href="#icon-youtube"></use>
+                </svg>
+              </a>
+              <a href="https://www.artstation.com/arthr0" target="_blank" aria-label="ArtStation">
+                <svg width="24" height="24" fill="currentColor">
+                  <use xlink:href="#icon-artstation"></use>
+                </svg>
+              </a>
+              <a href="mailto:cgarthro@gmail.com" aria-label="Email">
+                <svg width="24" height="24" fill="currentColor">
+                  <use xlink:href="#icon-email"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
         </div>
 
         <button class="liquid-button" onclick="document.getElementById('stills').scrollIntoView({behavior: 'smooth'})">
@@ -255,6 +262,62 @@
     <p>&copy; 2026 Hasamisa Studio. Designed with <span class="cyan-text">Precision</span>.</p>
   </footer>
 
+    <svg style="display: none">
+      <filter
+        id="glass-distortion"
+        x="0%"
+        y="0%"
+        width="100%"
+        height="100%"
+        filterUnits="objectBoundingBox"
+      >
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.01 0.01"
+          numOctaves="1"
+          seed="5"
+          result="turbulence"
+        />
+        <!-- Seeds: 14, 17,  -->
+
+        <feComponentTransfer in="turbulence" result="mapped">
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+        </feComponentTransfer>
+
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+
+        <feSpecularLighting
+          in="softMap"
+          surfaceScale="5"
+          specularConstant="1"
+          specularExponent="100"
+          lighting-color="white"
+          result="specLight"
+        >
+          <fePointLight x="-200" y="-200" z="300" />
+        </feSpecularLighting>
+
+        <feComposite
+          in="specLight"
+          operator="arithmetic"
+          k1="0"
+          k2="1"
+          k3="1"
+          k4="0"
+          result="litImage"
+        />
+
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="softMap"
+          scale="150"
+          xChannelSelector="R"
+          yChannelSelector="G"
+        />
+      </filter>
+    </svg>
   <script type="module" src="/src/main.js"></script>
 </body>
 
