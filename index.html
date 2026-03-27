@@ -41,19 +41,42 @@
     </symbol>
   </svg>
 
-  <nav class="navbar glass-nav">
-    <div class="logo">Hasamisa <span class="cyan-text">3D</span></div>
-    <ul class="nav-links">
-      <li><a href="#stills">Still Renders</a></li>
-      <li><a href="#products">Product Renders</a></li>
-      <li><a href="#animations">Animations</a></li>
-      <li><a href="#games">Games</a></li>
-      <li><a href="#about">About</a></li>
-    </ul>
-  </nav>
+  <fieldset class="switcher nav-switcher" id="main-nav">
+    <legend class="switcher__legend">Navigate</legend>
+
+    <label class="switcher__option" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="home" c-option="0" checked />
+      <span class="switcher__text">Home</span>
+    </label>
+    
+    <label class="switcher__option" onclick="document.getElementById('stills').scrollIntoView({behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="stills" c-option="1" />
+      <span class="switcher__text">Stills</span>
+    </label>
+    
+    <label class="switcher__option" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="products" c-option="2" />
+      <span class="switcher__text">Products</span>
+    </label>
+    
+    <label class="switcher__option" onclick="document.getElementById('animations').scrollIntoView({behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="animations" c-option="3" />
+      <span class="switcher__text">Animations</span>
+    </label>
+    
+    <label class="switcher__option" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="games" c-option="4" />
+      <span class="switcher__text">Games</span>
+    </label>
+    
+    <label class="switcher__option" onclick="document.getElementById('skills').scrollIntoView({behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="skills" c-option="5" />
+      <span class="switcher__text">About</span>
+    </label>
+  </fieldset>
 
   <main>
-    <section class="hero">
+    <section id="home" class="hero">
       <div class="hero-content">
         <h1 class="chromatic-text" data-text="CG Arthr0">CG <span class="cyan-text">Arthr0</span></h1>
         <p class="hero-subtitle">3D Generalist | Technical Artist</p>
@@ -263,6 +286,11 @@
   </footer>
 
     <svg style="display: none">
+      <filter id="nav-distortion">
+        <feTurbulence type="fractalNoise" baseFrequency="0.015 0.005" numOctaves="3" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+
       <filter
         id="glass-distortion"
         x="0%"
@@ -312,7 +340,7 @@
         <feDisplacementMap
           in="SourceGraphic"
           in2="softMap"
-          scale="150"
+          scale="30"
           xChannelSelector="R"
           yChannelSelector="G"
         />

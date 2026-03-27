@@ -62,45 +62,23 @@ input {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 90px;
-  height: 90px;
-  transform: translate(-50%, -50%);
-  border-radius: 35%; /* Squircle shape matching the WebGL superellipse */
-    
-  opacity: 0;
-  transition: opacity 0.3s;
-  animation: cursor-spin 6s linear infinite; /* Smooth, continuous rotation */
-}
-
-/* Distortion Layer (Bottom) */
-.cursor-lens::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  width: 60px;
+  height: 60px;
+  border-radius: 35%; /* Squircle — everything is one unified shape */
   
-  /* Edge distortion smoothed with a subtle blur */
-  backdrop-filter: blur(4px) url(#glass-distortion);
-  -webkit-backdrop-filter: blur(4px) url(#glass-distortion);
+  /* Glass Distortion — NO blur, pure refraction */
+  backdrop-filter: url(#glass-distortion);
+  -webkit-backdrop-filter: url(#glass-distortion);
   
-  /* Clear center, distorted edges mask, fading before it hits the border */
-  mask-image: radial-gradient(circle closest-side, transparent 40%, black 85%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle closest-side, transparent 40%, black 85%, transparent 100%);
-  
-  z-index: 1;
-}
-
-/* Crisp Glowing Border Layer (Top) */
-.cursor-lens::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid var(--cyan-light); /* 50% thinner as requested */
+  /* Cyan glowing edge */
+  border: 1px solid var(--cyan-light);
   box-shadow: 
-    0 0 15px var(--cyan-glow),
-    inset 0 0 15px var(--cyan-glow);
-  z-index: 2; /* Ensures it renders strictly over the distortion */
+    0 0 12px var(--cyan-glow),
+    inset 0 0 12px var(--cyan-glow);
+  
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  animation: cursor-spin 4s linear infinite; /* Everything rotates together */
 }
 
 /* On hover: hide lantern, show rotating lens */
@@ -109,6 +87,14 @@ input {
 }
 .custom-cursor.hover .cursor-lens {
   opacity: 1;
+}
+
+/* Hard override for Nav Switcher Area — prevents JS flicker */
+body:has(.nav-switcher:hover) .custom-cursor .cursor-lantern {
+  opacity: 0 !important;
+}
+body:has(.nav-switcher:hover) .custom-cursor .cursor-lens {
+  opacity: 1 !important;
 }
 
 @keyframes cursor-spin {
@@ -164,60 +150,145 @@ input {
 }
 
 /* Glassmorphism Classes */
-.glass-nav {
+/* --- Floating Logo --- */
+.floating-logo {
   position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 1.5rem 4rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(2, 11, 14, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--glass-border);
-  z-index: 1000;
-}
-
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  border-radius: 16px;
-}
-
-/* Navbar Links */
-.logo {
+  top: 28px;
+  left: 32px;
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: 2px;
-  position: relative;
-  z-index: 10;
+  z-index: 1000;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
 }
 
-.nav-links {
-  list-style: none;
+/* --- Floating Liquid Glass Nav --- */
+.nav-switcher {
+  --c-glass: rgba(12, 174, 185, 0.3); /* Exactly 25% reduction from original 0.4 */
+  --c-light: rgba(72, 229, 239, 1);
+  --c-dark: #010406;
+  --c-content: rgba(255, 255, 255, 0.7);
+  --c-action: #ffffff;
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.5;
+  --saturation: 150%;
+  
+  position: fixed;
+  z-index: 1000;
+  top: 20px;
+  left: 50%;
+  translate: -50%;
   display: flex;
-  gap: 3rem;
+  align-items: center;
+  gap: 8px;
+  height: 60px;
+  padding: 8px;
+  margin: 0;
+  border: 1px solid rgba(12, 174, 185, 0.2);
+  border-radius: 99em;
+  cursor: none !important;
+  
+  background: var(--c-glass);
+  backdrop-filter: blur(3px) url(#nav-distortion) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(3px) url(#nav-distortion) saturate(var(--saturation));
+  
+  box-shadow: 
+    inset 0 calc(var(--glass-reflex-dark) * -3px) calc(var(--glass-reflex-dark) * 10px) rgba(0,0,0,0.5),
+    inset 0 calc(var(--glass-reflex-light) * 3px) calc(var(--glass-reflex-light) * 10px) rgba(72,229,239,0.2),
+    inset 0 calc(var(--glass-reflex-dark) * -1px) calc(var(--glass-reflex-dark) * 2px) rgba(0,0,0,0.4),
+    inset 0 calc(var(--glass-reflex-light) * 1px) calc(var(--glass-reflex-light) * 2px) rgba(72,229,239,0.3),
+    inset 0 calc(var(--glass-reflex-dark) * -0.5px) calc(var(--glass-reflex-dark) * 1px) rgba(0,0,0,0.5),
+    inset 0 calc(var(--glass-reflex-light) * 0.5px) calc(var(--glass-reflex-light) * 1px) rgba(72,229,239,0.4),
+    0 10px 30px rgba(0,0,0,0.4);
+}
+
+.nav-switcher::before,
+.nav-switcher::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  bottom: 8px;
+  border-radius: 99em;
+}
+
+/* Sliding pill indicator */
+.nav-switcher::after {
+  width: 100px;
+  background: rgba(72, 229, 239, 0.1);
+  box-shadow: 
+    inset 0 1px 1px rgba(255,255,255,0.2), 
+    inset 0 -1px 1px rgba(0,0,0,0.4),
+    0 0 15px rgba(12, 174, 185, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(72, 229, 239, 0.3);
+  transition: translate 400ms cubic-bezier(1, 0, 0.4, 1);
+  pointer-events: none;
+}
+
+/* 100px width + 8px gap = 108px steps */
+.nav-switcher:has(input[c-option="0"]:checked)::after { translate: 0 0; }
+.nav-switcher:has(input[c-option="1"]:checked)::after { translate: 108px 0; }
+.nav-switcher:has(input[c-option="2"]:checked)::after { translate: 216px 0; }
+.nav-switcher:has(input[c-option="3"]:checked)::after { translate: 324px 0; }
+.nav-switcher:has(input[c-option="4"]:checked)::after { translate: 432px 0; }
+.nav-switcher:has(input[c-option="5"]:checked)::after { translate: 540px 0; }
+
+.switcher__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.switcher__option {
   position: relative;
-  z-index: 10;
+  z-index: 1;
+  width: 100px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none !important;
 }
 
-.nav-links a {
-  color: var(--text-dim);
-  text-decoration: none;
+.switcher__input {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  border-radius: 99em;
+  outline: none;
+  cursor: none !important;
+}
+
+.switcher__text {
+  position: relative;
+  z-index: 2;
+  font-family: inherit;
   font-weight: 600;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
+  font-size: 0.85rem;
   letter-spacing: 1px;
-  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: var(--c-content);
+  transition: all 0.3s ease;
+  cursor: none !important;
 }
 
-.nav-links a:hover {
-  color: var(--text-main);
-  text-shadow: 0 0 10px var(--cyan-light);
+.switcher__input:checked + .switcher__text {
+  color: var(--c-action);
+  text-shadow: 0 0 10px rgba(72, 229, 239, 0.8);
+}
+
+.switcher__option:hover .switcher__text {
+  color: var(--c-action);
 }
 
 /* Chromatic Aberration Text Effect */
@@ -501,7 +572,7 @@ input {
   aspect-ratio: 16/9;
   border-radius: 8px;
   overflow: hidden;
-  cursor: ew-resize;
+  cursor: none; /* Keep our custom cursor visible, not the native arrow */
   border: 1px solid rgba(72, 229, 239, 0.3);
   user-select: none;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
@@ -554,9 +625,15 @@ input {
   align-items: center;
   box-shadow: 0 0 20px var(--cyan-glow);
   pointer-events: auto;
-  cursor: ew-resize;
+  cursor: ew-resize !important;
   z-index: 10;
   backdrop-filter: blur(5px);
+}
+
+/* When hovering over the slider handle, hide lantern AND lens */
+.custom-cursor.sliding .cursor-lantern,
+.custom-cursor.sliding .cursor-lens {
+  opacity: 0 !important;
 }
 
 .slider-handle::before,

@@ -69,10 +69,23 @@ const createCursor = () => {
     cursor.style.top = `${e.clientY}px`;
   });
 
-  const hoverElements = document.querySelectorAll('a, button, .slider-handle, .skill-card, .project-showcase, input');
+  const hoverElements = document.querySelectorAll('a, button, .skill-card, .project-showcase, input');
   hoverElements.forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // Slider handle: show native ew-resize arrow, hide ALL custom cursors
+  const sliderHandles = document.querySelectorAll('.slider-handle');
+  sliderHandles.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.classList.add('sliding');
+      cursor.classList.remove('hover');
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.classList.remove('sliding');
+      cursor.classList.add('hover'); // Re-enter the parent image area
+    });
   });
 };
 document.addEventListener('DOMContentLoaded', createCursor);
@@ -334,6 +347,23 @@ async function loadDynamicGallery() {
       });
       el.addEventListener('mouseleave', () => {
         if (cursor) cursor.classList.remove('hover');
+      });
+    });
+
+    // Re-bind slider handles for new dynamic cards (sliding class hides custom cursor)
+    const newHandles = track.querySelectorAll('.slider-handle');
+    newHandles.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (cursor) {
+          cursor.classList.add('sliding');
+          cursor.classList.remove('hover');
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        if (cursor) {
+          cursor.classList.remove('sliding');
+          cursor.classList.add('hover');
+        }
       });
     });
 
@@ -745,6 +775,26 @@ function initLightbox() {
         
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Lock scroll
+
+        // Bind cursor hover for lightbox content (rotating lens inside, lantern outside)
+        const cursorEl = document.querySelector('.custom-cursor');
+        if (cursorEl) {
+          content.addEventListener('mouseenter', () => cursorEl.classList.add('hover'));
+          content.addEventListener('mouseleave', () => cursorEl.classList.remove('hover'));
+
+          // Re-bind slider handles inside lightbox for sliding class
+          const lbHandles = content.querySelectorAll('.slider-handle');
+          lbHandles.forEach(h => {
+            h.addEventListener('mouseenter', () => {
+              cursorEl.classList.add('sliding');
+              cursorEl.classList.remove('hover');
+            });
+            h.addEventListener('mouseleave', () => {
+              cursorEl.classList.remove('sliding');
+              cursorEl.classList.add('hover');
+            });
+          });
+        }
       });
     });
   };
@@ -762,3 +812,33 @@ function initLightbox() {
   observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
 }
 document.addEventListener('DOMContentLoaded', initLightbox);
+
+// --- Nav Scroll Observer ---
+document.addEventListener('DOMContentLoaded', () => {
+  const sections = document.querySelectorAll('section, header, footer');
+  const navRadios = document.querySelectorAll('.nav-switcher input[type="radio"]');
+
+  if (navRadios.length === 0) return;
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '-30% 0px -70% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        const correspondingRadio = document.querySelector(`.nav-switcher input[value="${id}"]`);
+        if (correspondingRadio) {
+          correspondingRadio.checked = true;
+        }
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(section => {
+    if (section.id) observer.observe(section);
+  });
+});
