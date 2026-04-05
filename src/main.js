@@ -280,6 +280,7 @@ animateMoths();
 async function loadDynamicGallery() {
   const track = document.getElementById('json-gallery-track');
   if (!track) return;
+  track.innerHTML = ''; // Clear hardcoded items
   
   try {
     const response = await fetch('/data.json');
@@ -814,11 +815,37 @@ function initLightbox() {
 document.addEventListener('DOMContentLoaded', initLightbox);
 
 // --- Nav Scroll Observer ---
+let isManualScrolling = false;
+
 document.addEventListener('DOMContentLoaded', () => {
   const sections = document.querySelectorAll('section, header, footer');
   const navRadios = document.querySelectorAll('.nav-switcher input[type="radio"]');
+  const navOptions = document.querySelectorAll('.nav-switcher .switcher__option');
 
   if (navRadios.length === 0) return;
+
+  // 1. Handle Manual Clicks (Prevent Flicker)
+  navOptions.forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      const input = opt.querySelector('input');
+      const targetId = input.value;
+      
+      isManualScrolling = true;
+      
+      // Perform the scroll
+      if (targetId === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // Re-enable observer after scroll finishes (approx 1s)
+      setTimeout(() => {
+        isManualScrolling = false;
+      }, 1000); 
+    });
+  });
 
   const observerOptions = {
     root: null,
@@ -827,6 +854,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const observer = new IntersectionObserver((entries) => {
+    if (isManualScrolling) return; // FIX: Ignore while manually scrolling
+
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const id = entry.target.getAttribute('id');
@@ -841,4 +870,57 @@ document.addEventListener('DOMContentLoaded', () => {
   sections.forEach(section => {
     if (section.id) observer.observe(section);
   });
+});
+
+/* --- Cinematic Intro & Audio Manager --- */
+const IntroManager = {
+  init() {
+    const curtain = document.getElementById('intro-curtain');
+    const enterBtn = document.getElementById('enter-experience');
+    
+    if (!curtain || !enterBtn) return;
+
+    enterBtn.addEventListener('click', () => {
+      curtain.classList.add('revealed');
+      this.startExperience();
+    });
+  },
+
+  startExperience() {
+    // Start Audio
+    AudioManager.playAmbient();
+    
+    // Optional: Trigger specific "first reveal" effects
+    console.log("Experience started. Ambient audio active.");
+  }
+};
+
+const AudioManager = {
+  ambient: null,
+  isMuted: false,
+
+  init() {
+    // Create hidden audio element for drone
+    this.ambient = new Audio('https://assets.mixkit.co/music/preview/mixkit-deep-space-drone-background-123.mp3'); // Placeholder
+    this.ambient.loop = true;
+    this.ambient.volume = 0.3;
+  },
+
+  playAmbient() {
+    if (this.ambient && !this.isMuted) {
+      this.ambient.play().catch(e => console.log("Audio playback blocked:", e));
+    }
+  },
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.isMuted) this.ambient.pause();
+    else this.ambient.play();
+  }
+};
+
+// Initialize on Load
+window.addEventListener('DOMContentLoaded', () => {
+  IntroManager.init();
+  AudioManager.init();
 });

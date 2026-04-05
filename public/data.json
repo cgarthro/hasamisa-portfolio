@@ -1,5 +1,12 @@
 [
   {
+    "title": "Casberry AI Particle Simulator",
+    "image": "/images/casberry-hero.png",
+    "link": "/projects/casberry-tech.html",
+    "animation": "float",
+    "aspectRatio": "16/9"
+  },
+  {
     "title": "My Favorite Wide Shot",
     "image": "https://cgarthro.carrd.co/assets/images/gallery03/33b455fe.jpg",
     "animation": "float",
@@ -14,14 +21,14 @@
   {
     "title": "Square Concept Art",
     "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1500&auto=format&fit=crop",
-"hdImage": "/images/noble.jpg",
+    "hdImage": "/images/noble.jpg",
     "animation": "wobble",
     "aspectRatio": "1/1"
   },
-{
-   "title": "Noble Oud",
-   "image": "/images/noble.jpg",
-   "beforeImage": "/images/2.jpg",
-   "aspectRatio": "1/1" 
- }
+  {
+    "title": "Noble Oud",
+    "image": "/images/noble.jpg",
+    "beforeImage": "/images/2.jpg",
+    "aspectRatio": "1/1" 
+  }
 ]

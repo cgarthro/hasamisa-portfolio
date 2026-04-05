@@ -10,7 +10,18 @@
   <link rel="stylesheet" href="/src/style.css">
 </head>
 
-<body>
+<body class="is-loading">
+  <!-- Cinematic Intro Curtain -->
+  <div id="intro-curtain">
+    <div class="curtain-content">
+      <h1 class="intro-logo chromatic-text" data-text="HASAMISA">HASAMISA</h1>
+      <button id="enter-experience" class="premium-button">
+        <span class="button-text">ENTER EXPERIENCE</span>
+        <div class="button-glow"></div>
+      </button>
+    </div>
+  </div>
+
   <!-- Moth Particle Swarm Canvases (back + front for 3D depth) -->
   <canvas id="moth-canvas-back"></canvas>
   <canvas id="moth-canvas-front"></canvas>
@@ -44,32 +55,32 @@
   <fieldset class="switcher nav-switcher" id="main-nav">
     <legend class="switcher__legend">Navigate</legend>
 
-    <label class="switcher__option" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="home" c-option="0" checked />
       <span class="switcher__text">Home</span>
     </label>
     
-    <label class="switcher__option" onclick="document.getElementById('stills').scrollIntoView({behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="stills" c-option="1" />
       <span class="switcher__text">Stills</span>
     </label>
     
-    <label class="switcher__option" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="products" c-option="2" />
       <span class="switcher__text">Products</span>
     </label>
     
-    <label class="switcher__option" onclick="document.getElementById('animations').scrollIntoView({behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="animations" c-option="3" />
       <span class="switcher__text">Animations</span>
     </label>
     
-    <label class="switcher__option" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="games" c-option="4" />
       <span class="switcher__text">Games</span>
     </label>
     
-    <label class="switcher__option" onclick="document.getElementById('skills').scrollIntoView({behavior: 'smooth'})">
+    <label class="switcher__option">
       <input class="switcher__input" type="radio" name="nav-theme" value="skills" c-option="5" />
       <span class="switcher__text">About</span>
     </label>
@@ -78,7 +89,7 @@
   <main>
     <section id="home" class="hero">
       <div class="hero-content">
-        <h1 class="chromatic-text" data-text="CG Arthr0">CG <span class="cyan-text">Arthr0</span></h1>
+        <h1 class="chromatic-text" data-text="HASAMISA">HASAMISA</h1>
         <p class="hero-subtitle">3D Generalist | Technical Artist</p>
         <p class="hero-desc">Versatile polymath & self-taught 3D Artist specializing in modeling, shading, and technical
           art.</p>

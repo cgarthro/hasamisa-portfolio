@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Title | Hasamisa 3D</title>
+  <!-- Modern Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    /* Project Page Specific Layout */
+    .project-header {
+      height: 60vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 60px;
+      background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
+    }
+    .project-header-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.6);
+    }
+    .project-title-area h1 {
+      font-size: 4rem;
+      margin-bottom: 10px;
+    }
+    .project-meta {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--cyan-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .project-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+    .story-section {
+      margin-bottom: 100px;
+    }
+    .story-section h2 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      color: var(--cyan-primary);
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .story-text {
+      line-height: 1.8;
+      color: var(--text-dim);
+    }
+    .story-image {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    @media (max-width: 768px) {
+      .story-grid { grid-template-columns: 1fr; }
+      .project-title-area h1 { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Moth Particle Swarm Canvases -->
+  <canvas id="moth-canvas-back"></canvas>
+  <canvas id="moth-canvas-front"></canvas>
+  
+  <div class="corner-glow top-left"></div>
+  <div class="corner-glow bottom-right"></div>
+
+  <!-- Navigation (Simplified for Project Pages) -->
+  <nav class="nav-switcher" style="top: 20px;">
+    <label class="switcher__option" onclick="window.location.href='/'">
+      <input class="switcher__input" type="radio" name="nav-theme" value="back" />
+      <span class="switcher__text">Back</span>
+    </label>
+    <label class="switcher__option" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="overview" checked />
+      <span class="switcher__text">Overview</span>
+    </label>
+  </nav>
+
+  <header class="project-header">
+    <img src="/placeholder-hero.jpg" alt="Hero" class="project-header-bg">
+    <div class="project-title-area">
+      <h1 class="chromatic-text" data-text="Project Title">Project Title</h1>
+      <div class="project-meta">
+        <span>Modeling</span>
+        <span>Lighting</span>
+        <span>2024</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="project-content">
+    <section class="story-section">
+      <div class="story-grid">
+        <div class="story-text">
+          <h2>The Brief</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+        <img src="/placeholder-1.jpg" alt="Concept" class="story-image">
+      </div>
+    </section>
+
+    <section class="story-section">
+      <h2>Technical Deep Dive</h2>
+      <div class="story-grid" style="grid-template-columns: 1fr;">
+         <div class="story-text">
+            <p>Detailing the custom shader work and high-fidelity modeling techniques used in this piece. We utilized a multi-layered procedural approach to achieve the complex surface tectures...</p>
+         </div>
+         <!-- Additional breakdown images here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Re-using the Social Dock -->
+  <footer class="dock-wrapper-fixed" style="position: fixed; bottom: 30px; left: 50%; translate: -50%;">
+     <!-- Dock HTML from index.html will be injected here if needed, or static -->
+  </footer>
+
+  <script src="/src/main.js"></script>
+</body>
+</html>

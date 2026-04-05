@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Casberry AI Particle Simulator | Hasamisa 3D</title>
+  <!-- Modern Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    /* Project Page Specific Layout */
+    .project-header {
+      height: 70vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 60px;
+      background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
+    }
+    .project-header-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.6) saturate(1.2);
+    }
+    .project-title-area h1 {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+    .project-meta {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--cyan-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .project-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+    .story-section {
+      margin-bottom: 120px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease-out;
+    }
+    .story-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .story-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: var(--cyan-primary);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .story-text {
+      line-height: 1.8;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+    .story-image {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      transition: transform 0.5s ease;
+    }
+    .story-image:hover {
+      transform: scale(1.02);
+    }
+    .tech-specs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .spec-item {
+      padding: 20px;
+      background: rgba(12, 174, 185, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .spec-val {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--cyan-primary);
+    }
+    .spec-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    @media (max-width: 768px) {
+      .story-grid { grid-template-columns: 1fr; gap: 30px; }
+      .project-title-area h1 { font-size: 2.8rem; }
+      .project-header { height: 50vh; padding: 30px; }
+    }
+  </style>
+</head>
+<body class="is-loading">
+  <!-- Moth Particle Swarm Canvases -->
+  <canvas id="moth-canvas-back"></canvas>
+  <canvas id="moth-canvas-front"></canvas>
+  
+  <div class="corner-glow top-left"></div>
+  <div class="corner-glow bottom-right"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-switcher" style="top: 30px;">
+    <label class="switcher__option" onclick="window.location.href='/'">
+      <input class="switcher__input" type="radio" name="nav-theme" value="back" />
+      <span class="switcher__text">Back</span>
+    </label>
+    <label class="switcher__option" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="overview" checked />
+      <span class="switcher__text">Overview</span>
+    </label>
+  </nav>
+
+  <header class="project-header">
+    <img src="/images/casberry-hero.png" alt="Casberry AI Particle Simulator" class="project-header-bg">
+    <div class="project-title-area">
+      <h1 class="chromatic-text" data-text="Casberry AI">Casberry <span class="cyan-text">AI</span></h1>
+      <div class="project-meta">
+        <span>Particle Simulation</span>
+        <span>WebGL</span>
+        <span>2024</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="project-content">
+    <section class="story-section">
+      <div class="story-grid">
+        <div class="story-text">
+          <h2>The Vision</h2>
+          <p>The Casberry AI Particle Simulator was developed as a high-fidelity visualization tool for complex atomic and neural patterns. By leveraging GPU compute shaders, we achieved a stable simulation of over 20,000 active units moving in harmonious geometric formations.</p>
+          <div class="tech-specs">
+            <div class="spec-item">
+              <span class="spec-val">20K+</span>
+              <span class="spec-label">Units</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-val">60 FPS</span>
+              <span class="spec-label">Real-time</span>
+            </div>
+          </div>
+        </div>
+        <img src="/images/casberry-vision.png" alt="Simulation UI" class="story-image">
+      </div>
+    </section>
+
+    <section class="story-section">
+      <h2>Technical Deep Dive</h2>
+      <div class="story-grid">
+        <img src="/images/casberry-geodesic.png" alt="Geodesic Sphere" class="story-image">
+        <div class="story-text">
+          <p>The core of the simulator uses a Geodesic Sphere distribution algorithm, ensuring perfectly uniform point density across spherical surfaces. The "Smart Text Engine" allows users to morph particle clouds into high-contrast typography, bridging the gap between abstract art and functional UI.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="story-section" style="text-align: center;">
+      <h2>Final Outcome</h2>
+      <img src="/images/casberry-final.png" alt="Final Render" class="story-image" style="margin-top: 20px;">
+      <p class="story-text" style="margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        A premium, interactive experience that showcases the power of browser-based 3D computing. Casberry represents the intersection of technical excellence and luxurious design.
+      </p>
+    </section>
+  </main>
+
+  <!-- Social Dock Spacer -->
+  <div style="height: 150px;"></div>
+
+  <script src="/src/main.js"></script>
+  <script>
+    // Intersection Observer for section reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.story-section').forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>
