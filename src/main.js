@@ -831,6 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = input.value;
       
       isManualScrolling = true;
+      AudioManager.play('click');
       
       // Perform the scroll
       if (targetId === 'home') {
@@ -840,11 +841,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
       }
 
-      // Re-enable observer after scroll finishes (approx 1s)
-      setTimeout(() => {
+      // Re-enable observer strictly when scroll fully finishes
+      clearTimeout(window.manualScrollTimeout);
+      const onScrollEnd = () => {
         isManualScrolling = false;
-      }, 1000); 
+        window.removeEventListener('scrollend', onScrollEnd);
+      };
+      window.addEventListener('scrollend', onScrollEnd);
+      // Fallback for older browsers
+      window.manualScrollTimeout = setTimeout(onScrollEnd, 1500); 
     });
+    
+    // Add hover audio to nav options
+    opt.addEventListener('mouseenter', () => AudioManager.play('hover'));
   });
 
   const observerOptions = {
@@ -872,55 +881,78 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* --- Cinematic Intro & Audio Manager --- */
-const IntroManager = {
-  init() {
-    const curtain = document.getElementById('intro-curtain');
-    const enterBtn = document.getElementById('enter-experience');
-    
-    if (!curtain || !enterBtn) return;
-
-    enterBtn.addEventListener('click', () => {
-      curtain.classList.add('revealed');
-      this.startExperience();
-    });
-  },
-
-  startExperience() {
-    // Start Audio
-    AudioManager.playAmbient();
-    
-    // Optional: Trigger specific "first reveal" effects
-    console.log("Experience started. Ambient audio active.");
-  }
-};
-
+/* --- Dynamic Audio Manager --- */
 const AudioManager = {
-  ambient: null,
-  isMuted: false,
-
-  init() {
-    // Create hidden audio element for drone
-    this.ambient = new Audio('https://assets.mixkit.co/music/preview/mixkit-deep-space-drone-background-123.mp3'); // Placeholder
-    this.ambient.loop = true;
-    this.ambient.volume = 0.3;
+  isMuted: true, // Auto-play policies usually require this to be true initially
+  hasInteracted: false,
+  sounds: {
+    ambient: null,
+    lantern: null,
+    hover: null,
+    click: null
   },
 
-  playAmbient() {
-    if (this.ambient && !this.isMuted) {
-      this.ambient.play().catch(e => console.log("Audio playback blocked:", e));
+  init() {
+    // Note: Update these paths to your actual public/audio/ files
+    this.sounds.ambient = new Audio('/audio/ambient-drone.mp3');
+    this.sounds.ambient.loop = true;
+    this.sounds.ambient.volume = 0.3;
+
+    this.sounds.lantern = new Audio('/audio/lantern-burn.mp3');
+    this.sounds.lantern.loop = true;
+    this.sounds.lantern.volume = 0.5;
+
+    this.sounds.hover = new Audio('/audio/ui-hover.mp3');
+    this.sounds.hover.volume = 0.4;
+
+    this.sounds.click = new Audio('/audio/ui-click.mp3');
+    this.sounds.click.volume = 0.8;
+
+    // Listen for the first user interaction to unlock audio engine safely
+    window.addEventListener('click', () => {
+      if (!this.hasInteracted) {
+        this.hasInteracted = true;
+        this.isMuted = false;
+        this.play('ambient');
+        this.play('lantern');
+      }
+    }, { once: true });
+  },
+
+  play(soundName) {
+    if (this.isMuted || !this.sounds[soundName]) return;
+    
+    const audio = this.sounds[soundName];
+    // Reset time for quick consecutive sound effects (like rapid hovering/clicking)
+    if (!audio.loop) {
+      audio.currentTime = 0;
+    }
+    
+    // Play with catch to prevent console spam if browser blocks it
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => { /* Audio blocked */ });
+    }
+  },
+
+  stop(soundName) {
+    if (this.sounds[soundName]) {
+      this.sounds[soundName].pause();
     }
   },
 
   toggleMute() {
     this.isMuted = !this.isMuted;
-    if (this.isMuted) this.ambient.pause();
-    else this.ambient.play();
+    if (this.isMuted) {
+      Object.keys(this.sounds).forEach(key => this.stop(key));
+    } else {
+      this.play('ambient');
+      this.play('lantern');
+    }
   }
 };
 
 // Initialize on Load
 window.addEventListener('DOMContentLoaded', () => {
-  IntroManager.init();
   AudioManager.init();
 });
