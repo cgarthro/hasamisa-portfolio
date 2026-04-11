@@ -71,8 +71,20 @@ const createCursor = () => {
 
   const hoverElements = document.querySelectorAll('a, button, .skill-card, .project-showcase, input');
   hoverElements.forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    el.addEventListener('mouseenter', () => {
+      cursor.classList.add('hover');
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.stop('lantern');
+        AudioManager.play('hover');
+      }
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.classList.remove('hover');
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.stop('hover');
+        AudioManager.play('lantern');
+      }
+    });
   });
 
   // Slider handle: show native ew-resize arrow, hide ALL custom cursors
@@ -281,11 +293,11 @@ async function loadDynamicGallery() {
   const track = document.getElementById('json-gallery-track');
   if (!track) return;
   track.innerHTML = ''; // Clear hardcoded items
-  
+
   try {
     const response = await fetch('/data.json');
     if (!response.ok) throw new Error('Could not fetch data.json');
-    
+
     const projects = await response.json();
 
     const isVideo = (path) => {
@@ -300,7 +312,7 @@ async function loadDynamicGallery() {
       }
       return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
     };
-    
+
     projects.forEach(proj => {
       const card = document.createElement('div');
       card.className = 'project-showcase glass-card dynamic-card';
@@ -309,8 +321,8 @@ async function loadDynamicGallery() {
 
       const hasLink = !!proj.link;
       if (hasLink) card.dataset.link = proj.link;
-      
-      const iconHtml = hasLink 
+
+      const iconHtml = hasLink
         ? `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`
         : `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
 
@@ -335,7 +347,7 @@ async function loadDynamicGallery() {
           </div>
         `;
       }
-      
+
       track.appendChild(card);
     });
 
@@ -345,9 +357,17 @@ async function loadDynamicGallery() {
     hoverElements.forEach(el => {
       el.addEventListener('mouseenter', () => {
         if (cursor) cursor.classList.add('hover');
+        if (typeof AudioManager !== 'undefined') {
+          AudioManager.stop('lantern');
+          AudioManager.play('hover');
+        }
       });
       el.addEventListener('mouseleave', () => {
         if (cursor) cursor.classList.remove('hover');
+        if (typeof AudioManager !== 'undefined') {
+          AudioManager.stop('hover');
+          AudioManager.play('lantern');
+        }
       });
     });
 
@@ -388,10 +408,10 @@ document.addEventListener('DOMContentLoaded', loadDynamicGallery);
 // Force mathematical bounds on Dynamic Gallery cards so aspect ratio never distorts!
 window.calculateCardDimensions = () => {
   const cards = document.querySelectorAll('.project-showcase.dynamic-card');
-  
+
   // The outer card is 90vw max. We MUST subtract its 4rem (64px) horizontal padding 
   // so the inner media box doesn't burst out of the glass boundary on narrow screens!
-  const maxW = (window.innerWidth * 0.90) - 64; 
+  const maxW = (window.innerWidth * 0.90) - 64;
   const targetH = window.innerHeight * 0.45;
 
   cards.forEach(card => {
@@ -420,8 +440,8 @@ window.calculateCardDimensions = () => {
   });
 };
 
-window.addEventListener('resize', () => { 
-  if (typeof calculateCardDimensions === 'function') calculateCardDimensions(); 
+window.addEventListener('resize', () => {
+  if (typeof calculateCardDimensions === 'function') calculateCardDimensions();
 });
 
 // 2. Horizontal Scroll Logic for Multiple Galleries
@@ -431,7 +451,7 @@ function updateGalleryDimensions() {
   gallerySections.forEach(section => {
     const track = section.querySelector('.gallery-track');
     if (!track) return;
-    
+
     // Dynamic 1:1 scroll speed: Track width dictates section scroll height
     const trackWidth = track.scrollWidth;
     // adding innerHeight ensures we have enough scroll distance to fully view it at a natural 1:1 speed
@@ -443,7 +463,7 @@ function updateGalleryDimensions() {
 window.addEventListener('load', updateGalleryDimensions);
 window.addEventListener('resize', updateGalleryDimensions);
 // Also call immediately after dynamic injection
-document.addEventListener('DOMContentLoaded', () => setTimeout(updateGalleryDimensions, 500)); 
+document.addEventListener('DOMContentLoaded', () => setTimeout(updateGalleryDimensions, 500));
 
 window.addEventListener('scroll', () => {
   gallerySections.forEach(section => {
@@ -462,16 +482,16 @@ window.addEventListener('scroll', () => {
     // Calculate exact start and end transforms to perfectly center the first and last cards
     const firstCard = track.firstElementChild;
     const lastCard = track.lastElementChild;
-    
+
     // Starting offset: pushes the first card's center to the window's center
     const startTranslateX = (window.innerWidth / 2) - (firstCard.offsetLeft + (firstCard.offsetWidth / 2));
-    
+
     // Ending offset: pushes the last card's center to the window's center
     const endTranslateX = (window.innerWidth / 2) - (lastCard.offsetLeft + (lastCard.offsetWidth / 2));
-    
+
     // Interpolate
     const currentTranslateX = startTranslateX + (clampedProgress * (endTranslateX - startTranslateX));
-    
+
     track.style.transform = `translateX(${currentTranslateX}px)`;
   });
 }, { passive: true });
@@ -491,7 +511,7 @@ function bindSliders(scope = document) {
     const syncImageWidth = () => {
       innerImg.style.width = `${slider.clientWidth}px`;
       innerImg.style.height = `${slider.clientHeight}px`;
-      
+
       const beforeImg = slider.querySelector('.before-image img, .before-image video');
       if (beforeImg) {
         beforeImg.style.width = `${slider.clientWidth}px`;
@@ -502,7 +522,7 @@ function bindSliders(scope = document) {
     window.addEventListener('resize', syncImageWidth);
     setTimeout(syncImageWidth, 100);
     setTimeout(syncImageWidth, 350); // After Lightbox 0.3s CSS opacity transition
-    
+
     if (window.ResizeObserver) {
       new ResizeObserver(() => syncImageWidth()).observe(slider);
     }
@@ -628,7 +648,7 @@ function initLightbox() {
   };
 
   closeBtn.addEventListener('click', closeLightbox);
-  
+
   let modalDownX = 0, modalDownY = 0;
   modal.addEventListener('mousedown', (e) => {
     modalDownX = e.clientX;
@@ -670,27 +690,27 @@ function initLightbox() {
         // We only clear the media elements, not the close button
         Array.from(content.children).forEach(child => {
           if (!child.classList.contains('lightbox-close')) child.remove();
-        }); 
+        });
 
         const slider = card.querySelector('.comparison-slider');
         if (slider) {
           const clonedSlider = slider.cloneNode(true);
           clonedSlider.classList.remove('bound');
-          
+
           const ratioStr = card.style.getPropertyValue('--card-ratio') || '16/9';
           let [rw, rh] = ratioStr.split('/').map(Number);
           if (!rw || !rh) { rw = 16; rh = 9; }
           const ratio = rw / rh;
-          
+
           let w = window.innerWidth * 0.95;
           let h = w / ratio;
-          
+
           const maxH = window.innerHeight * 0.95;
           if (h > maxH) {
             h = maxH;
             w = h * ratio;
           }
-          
+
           clonedSlider.style.width = `${Math.floor(w)}px`;
           clonedSlider.style.height = `${Math.floor(h)}px`;
           clonedSlider.style.maxWidth = 'none';
@@ -703,7 +723,7 @@ function initLightbox() {
               const loader = document.createElement('div');
               loader.className = 'hd-loader';
               clonedSlider.querySelector('.before-image').appendChild(loader);
-              
+
               const loadHdBefore = () => {
                 const hdImg = new Image();
                 hdImg.onload = () => {
@@ -712,7 +732,7 @@ function initLightbox() {
                 };
                 hdImg.src = slider.dataset.hdBefore;
               };
-              
+
               if (beforeMedia.complete) loadHdBefore();
               else { beforeMedia.onload = loadHdBefore; beforeMedia.onerror = loadHdBefore; }
             }
@@ -723,7 +743,7 @@ function initLightbox() {
               const loader = document.createElement('div');
               loader.className = 'hd-loader';
               clonedSlider.querySelector('.after-image').appendChild(loader);
-              
+
               const loadHdAfter = () => {
                 const hdImg = new Image();
                 hdImg.onload = () => {
@@ -732,7 +752,7 @@ function initLightbox() {
                 };
                 hdImg.src = slider.dataset.hdAfter;
               };
-              
+
               if (afterMedia.complete) loadHdAfter();
               else { afterMedia.onload = loadHdAfter; afterMedia.onerror = loadHdAfter; }
             }
@@ -745,17 +765,17 @@ function initLightbox() {
           if (!mediaContainer) return;
           let media = mediaContainer.querySelector('img, video');
           if (!media) return;
-          
+
           const clonedMedia = media.cloneNode(true);
           clonedMedia.className = '';
-          
+
           // HD Image swapping with Progressive Loading
           if (mediaContainer.dataset.hd) {
             if (clonedMedia.tagName.toLowerCase() === 'img') {
               const loader = document.createElement('div');
               loader.className = 'hd-loader';
               content.appendChild(loader); // Append loader to content, it will be removed after image loads
-              
+
               const loadHd = () => {
                 const hdImg = new Image();
                 hdImg.onload = () => {
@@ -764,7 +784,7 @@ function initLightbox() {
                 };
                 hdImg.src = mediaContainer.dataset.hd;
               };
-              
+
               if (clonedMedia.complete) loadHd();
               else { clonedMedia.onload = loadHd; clonedMedia.onerror = loadHd; }
             } else if (clonedMedia.tagName.toLowerCase() === 'video') {
@@ -773,7 +793,7 @@ function initLightbox() {
           }
           content.appendChild(clonedMedia);
         }
-        
+
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Lock scroll
 
@@ -801,7 +821,7 @@ function initLightbox() {
   };
 
   bindLightbox(document);
-  
+
   // Custom observer to release scroll lock when closing
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
@@ -829,10 +849,9 @@ document.addEventListener('DOMContentLoaded', () => {
     opt.addEventListener('click', (e) => {
       const input = opt.querySelector('input');
       const targetId = input.value;
-      
+
       isManualScrolling = true;
-      AudioManager.play('click');
-      
+
       // Perform the scroll
       if (targetId === 'home') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -849,11 +868,31 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       window.addEventListener('scrollend', onScrollEnd);
       // Fallback for older browsers
-      window.manualScrollTimeout = setTimeout(onScrollEnd, 1500); 
+      window.manualScrollTimeout = setTimeout(onScrollEnd, 1500);
     });
-    
-    // Add hover audio to nav options
-    opt.addEventListener('mouseenter', () => AudioManager.play('hover'));
+
+    // Add hover mutually exclusive audio to nav options
+    opt.addEventListener('mouseenter', () => {
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.stop('lantern');
+        AudioManager.play('hover');
+      }
+    });
+    opt.addEventListener('mouseleave', () => {
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.stop('hover');
+        AudioManager.play('lantern');
+      }
+    });
+  });
+
+  // Global click audio delegation
+  document.body.addEventListener('click', (e) => {
+    if (e.target.closest('a, button, .project-showcase, input, .lightbox-close, .switcher__option')) {
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.play('click');
+      }
+    }
   });
 
   const observerOptions = {
@@ -896,13 +935,14 @@ const AudioManager = {
     // Note: Update these paths to your actual public/audio/ files
     this.sounds.ambient = new Audio('/audio/ambient-drone.mp3');
     this.sounds.ambient.loop = true;
-    this.sounds.ambient.volume = 0.3;
+    this.sounds.ambient.volume = 0.1;
 
     this.sounds.lantern = new Audio('/audio/lantern-burn.mp3');
     this.sounds.lantern.loop = true;
     this.sounds.lantern.volume = 0.5;
 
     this.sounds.hover = new Audio('/audio/ui-hover.mp3');
+    this.sounds.hover.loop = true;
     this.sounds.hover.volume = 0.4;
 
     this.sounds.click = new Audio('/audio/ui-click.mp3');
@@ -921,13 +961,13 @@ const AudioManager = {
 
   play(soundName) {
     if (this.isMuted || !this.sounds[soundName]) return;
-    
+
     const audio = this.sounds[soundName];
     // Reset time for quick consecutive sound effects (like rapid hovering/clicking)
     if (!audio.loop) {
       audio.currentTime = 0;
     }
-    
+
     // Play with catch to prevent console spam if browser blocks it
     const playPromise = audio.play();
     if (playPromise !== undefined) {
