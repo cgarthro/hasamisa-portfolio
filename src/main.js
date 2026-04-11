@@ -102,6 +102,32 @@ const createCursor = () => {
 };
 document.addEventListener('DOMContentLoaded', createCursor);
 
+// 0.5 Dynamic Liquid Glass Navigation Pill
+document.addEventListener('DOMContentLoaded', () => {
+  const switchers = document.querySelectorAll('.switcher__input');
+  const navPill = document.querySelector('.nav-switcher');
+
+  function updatePill() {
+    const checked = document.querySelector('.switcher__input:checked');
+    if (!checked || !navPill) return;
+
+    const label = checked.closest('.switcher__option');
+    if (label) {
+      const left = label.offsetLeft;
+      const width = label.offsetWidth;
+      navPill.style.setProperty('--pill-left', `${left}px`);
+      navPill.style.setProperty('--pill-width', `${width}px`);
+    }
+  }
+
+  // Initialize pill geometry
+  updatePill();
+  // Listen for active tab changes
+  switchers.forEach(radio => radio.addEventListener('change', updatePill));
+  // Keep the pill anchored smoothly if the user dynamically resizes the mobile/desktop viewport
+  window.addEventListener('resize', updatePill);
+});
+
 /// 1. Moth Particle Swarm Cursor — Dual-canvas for 3D depth
 const canvasBack = document.getElementById('moth-canvas-back');
 const canvasFront = document.getElementById('moth-canvas-front');
