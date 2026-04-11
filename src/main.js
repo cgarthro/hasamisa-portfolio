@@ -895,6 +895,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Global glitch audio delegation
+  document.body.addEventListener('mouseover', (e) => {
+    const chromaticText = e.target.closest('.chromatic-text');
+    // Ensure we only trigger once when entering the bounds of the element (like mouseenter)
+    if (chromaticText && !chromaticText.contains(e.relatedTarget)) {
+      if (typeof AudioManager !== 'undefined') {
+        if (AudioManager.sounds?.glitch) {
+          AudioManager.sounds.glitch.currentTime = 0;
+        }
+        AudioManager.play('glitch');
+      }
+    }
+  });
+
+  // Global glitch audio delegation
+  document.body.addEventListener('mouseover', (e) => {
+    const chromaticText = e.target.closest('.chromatic-text');
+    // Ensure we only trigger once when entering the bounds of the element (like mouseenter)
+    if (chromaticText && !chromaticText.contains(e.relatedTarget)) {
+      if (typeof AudioManager !== 'undefined') {
+        if (AudioManager.sounds?.glitch) {
+          AudioManager.sounds.glitch.currentTime = 0;
+        }
+        AudioManager.play('glitch');
+      }
+    }
+  });
+
   const observerOptions = {
     root: null,
     rootMargin: '-30% 0px -70% 0px',
@@ -925,17 +953,36 @@ const AudioManager = {
   isMuted: true, // Auto-play policies usually require this to be true initially
   hasInteracted: false,
   sounds: {
-    ambient: null,
+    ambient1: null,
+    ambient2A: null,
+    ambient2B: null,
     lantern: null,
     hover: null,
-    click: null
+    click: null,
+    glitch: null
   },
+  
+  // Custom Overlapping Loop Settings mapping directly to seconds
+  ambientSettings: {
+    transitionDelaySeconds: 53.00,  // End of ambient 1 / Start of ambient 2
+    ambient2OverlapDelay: 39.83     // Loop trigger point for overlapping (39s + (20frames/24fps))
+  },
+  nextAmbient2Track: 'ambient2A',
 
   init() {
     // Note: Update these paths to your actual public/audio/ files
-    this.sounds.ambient = new Audio('/audio/ambient-drone.mp3');
-    this.sounds.ambient.loop = true;
-    this.sounds.ambient.volume = 0.1;
+    this.sounds.ambient1 = new Audio('/audio/ambient1.mp3');
+    this.sounds.ambient1.loop = false;
+    this.sounds.ambient1.volume = 0.5;
+
+    // We use two tracks so they can overlap and play simultaneously
+    this.sounds.ambient2A = new Audio('/audio/ambient2.mp3');
+    this.sounds.ambient2A.loop = false;
+    this.sounds.ambient2A.volume = 0.1;
+    
+    this.sounds.ambient2B = new Audio('/audio/ambient2.mp3');
+    this.sounds.ambient2B.loop = false;
+    this.sounds.ambient2B.volume = 0.1;
 
     this.sounds.lantern = new Audio('/audio/lantern-burn.mp3');
     this.sounds.lantern.loop = true;
@@ -948,15 +995,39 @@ const AudioManager = {
     this.sounds.click = new Audio('/audio/ui-click.mp3');
     this.sounds.click.volume = 0.8;
 
+    this.sounds.glitch = new Audio('/audio/glitch.mp3');
+    this.sounds.glitch.volume = 0.7;
+
     // Listen for the first user interaction to unlock audio engine safely
     window.addEventListener('click', () => {
       if (!this.hasInteracted) {
         this.hasInteracted = true;
         this.isMuted = false;
-        this.play('ambient');
+        this.play('ambient1');
+        
+        // Adjustable seconds before the looping ambient2 starts
+        setTimeout(() => {
+          this.playOverlappingAmbient2();
+        }, this.ambientSettings.transitionDelaySeconds * 1000);
+
         this.play('lantern');
       }
     }, { once: true });
+  },
+
+  playOverlappingAmbient2() {
+    if (this.isMuted) return;
+    
+    // Play the current track
+    this.play(this.nextAmbient2Track);
+    
+    // Swap tracks for the next loop so they can overlap
+    this.nextAmbient2Track = this.nextAmbient2Track === 'ambient2A' ? 'ambient2B' : 'ambient2A';
+    
+    // Schedule the next track to start overlapping based on the delay setting
+    setTimeout(() => {
+      this.playOverlappingAmbient2();
+    }, this.ambientSettings.ambient2OverlapDelay * 1000);
   },
 
   play(soundName) {
