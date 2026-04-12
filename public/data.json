@@ -1,34 +1,84 @@
-[
-  {
-    "title": "Casberry AI Particle Simulator",
-    "image": "/images/casberry-hero.png",
-    "link": "/projects/casberry-tech.html",
-    "animation": "float",
-    "aspectRatio": "16/9"
-  },
-  {
-    "title": "My Favorite Wide Shot",
-    "image": "https://cgarthro.carrd.co/assets/images/gallery03/33b455fe.jpg",
-    "animation": "float",
-    "aspectRatio": "16/9"
-  },
-  {
-    "title": "Tall Character Render",
-    "image": "/images/noble.jpg",
-    "animation": "pulse",
-    "aspectRatio": "9/16"
-  },
-  {
-    "title": "Square Concept Art",
-    "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1500&auto=format&fit=crop",
-    "hdImage": "/images/noble.jpg",
-    "animation": "wobble",
-    "aspectRatio": "1/1"
-  },
-  {
-    "title": "Noble Oud",
-    "image": "/images/noble.jpg",
-    "beforeImage": "/images/2.jpg",
-    "aspectRatio": "1/1" 
-  }
-]
+{
+  "stills": [
+    {
+      "title": "Halloween Witch Bunny",
+      "beforeImage": "/images/Cbunny2.webp",
+      "image": "/images/Cbunny.webp",
+      "hdBeforeImage": "/images/bunny2.webp",
+      "hdImage": "/images/bunny.webp",
+      "animation": "float",
+      "aspectRatio": "3/4"
+    },
+    {
+      "title": "Alive Orange Splashes",
+      "image": "/images/Calive.webp",
+      "hdBeforeImage": "/images/alive2.webp",
+      "hdImage": "/images/alive.webp",
+      "animation": "float",
+      "aspectRatio": "1/1"
+    },
+    {
+      "title": "Girl Portrait",
+      "beforeImage": "/images/Cgirl2.webp",
+      "image": "/images/Cgirl.webp",
+      "hdBeforeImage": "/images/girl2.webp",
+      "hdImage": "/images/girl.webp",
+      "animation": "float",
+      "aspectRatio": "3/5"
+    },
+    {
+      "title": "Flora",
+      "image": "/images/Cflora.webp",
+      "hdBeforeImage": "/images/flora2.webp",
+      "hdImage": "/images/flora.webp",
+      "animation": "float",
+      "aspectRatio": "1/1",
+      "hdAspectRatio": "2/1"
+    },
+    {
+      "title": "Noble Oud",
+      "image": "/images/Cnoble.webp",
+      "beforeImage": "/images/noble2.webp",
+      "hdBeforeImage": "/images/noble2.webp",
+      "hdImage": "/images/noble.webp",
+      "animation": "float",
+      "aspectRatio": "1/1"
+    },
+    {
+      "title": "Lamb in Forest River",
+      "image": "/images/Csheep.webp",
+      "hdImage": "/images/sheep.webp",
+      "animation": "float",
+      "aspectRatio": "16/9"
+    }
+  ],
+  "products": [
+    {
+      "title": "Perfume",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery07/463b570f.gif",
+      "animation": "wobble",
+      "aspectRatio": "1/1"
+    }
+  ],
+  "animations": [
+    {
+      "title": "Cloth Simulation",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery05/56f0388f.jpg",
+      "link": "https://youtube.com/shorts/RkGr7peq6OI?si=qxaV6cHWQr0HGhDu",
+      "animation": "float",
+      "aspectRatio": "9/16"
+    },
+    {
+      "title": "Beach Cinematic",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery05/331e06be.jpg",
+      "animation": "pulse",
+      "aspectRatio": "16/9"
+    },
+    {
+      "title": "Lavender Field March",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery05/2426cf28.jpg",
+      "animation": "wobble",
+      "aspectRatio": "16/9"
+    }
+  ]
+}

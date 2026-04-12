@@ -316,15 +316,11 @@ animateMoths();
 
 // 1.5 Dynamic JSON Gallery Loader
 async function loadDynamicGallery() {
-  const track = document.getElementById('json-gallery-track');
-  if (!track) return;
-  track.innerHTML = ''; // Clear hardcoded items
-
   try {
     const response = await fetch('/data.json');
     if (!response.ok) throw new Error('Could not fetch data.json');
 
-    const projects = await response.json();
+    const categories = await response.json();
 
     const isVideo = (path) => {
       if (!path) return false;
@@ -339,46 +335,57 @@ async function loadDynamicGallery() {
       return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
     };
 
-    projects.forEach(proj => {
-      const card = document.createElement('div');
-      card.className = 'project-showcase glass-card dynamic-card';
-      // Pass the aspect ratio to CSS so widths variably adjust!
-      card.style.setProperty('--card-ratio', proj.aspectRatio || '16/9');
+    Object.keys(categories).forEach(categoryKey => {
+      const track = document.getElementById(`${categoryKey}-track`);
+      if (!track) return;
+      track.innerHTML = ''; // Ensure cleanly empty
 
-      const hasLink = !!proj.link;
-      if (hasLink) card.dataset.link = proj.link;
+      const projects = categories[categoryKey];
 
-      const iconHtml = hasLink
-        ? `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`
-        : `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
+      projects.forEach(proj => {
+        const card = document.createElement('div');
+        card.className = 'project-showcase glass-card dynamic-card';
+        // Pass the aspect ratio to CSS so widths variably adjust!
+        card.style.setProperty('--card-ratio', proj.aspectRatio || '16/9');
+        if (proj.hdAspectRatio) card.dataset.hdRatio = proj.hdAspectRatio;
 
-      if (proj.beforeImage) {
-        card.innerHTML = `
-          ${iconHtml}
-          <h3>${proj.title}</h3>
-          <div class="comparison-slider" 
-               ${proj.hdBeforeImage ? `data-hd-before="${proj.hdBeforeImage}"` : ''}
-               ${proj.hdImage ? `data-hd-after="${proj.hdImage}"` : ''}>
-            <div class="before-image">${renderMedia(proj.beforeImage, '', 'Before')}</div>
-            <div class="after-image">${renderMedia(proj.image, '', 'Final')}</div>
-            <div class="slider-handle"></div>
-          </div>
-        `;
-      } else {
-        card.innerHTML = `
-          ${iconHtml}
-          <h3>${proj.title}</h3>
-          <div class="media-container" ${proj.hdImage ? `data-hd="${proj.hdImage}"` : ''}>
-            ${renderMedia(proj.image, `ambient-img ${proj.animation || ''}`, proj.title)}
-          </div>
-        `;
-      }
+        const hasLink = !!proj.link;
+        if (hasLink) card.dataset.link = proj.link;
 
-      track.appendChild(card);
+        const iconHtml = hasLink
+          ? `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`
+          : `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
+
+        if (proj.beforeImage) {
+          card.innerHTML = `
+            ${iconHtml}
+            <h3>${proj.title}</h3>
+            <div class="comparison-slider" 
+                 ${proj.hdBeforeImage ? `data-hd-before="${proj.hdBeforeImage}"` : ''}
+                 ${proj.hdImage ? `data-hd-after="${proj.hdImage}"` : ''}>
+              <div class="before-image">${renderMedia(proj.beforeImage, '', 'Before')}</div>
+              <div class="after-image">${renderMedia(proj.image, '', 'Final')}</div>
+              <div class="slider-handle"></div>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            ${iconHtml}
+            <h3>${proj.title}</h3>
+            <div class="media-container" 
+                 ${proj.hdImage ? `data-hd="${proj.hdImage}"` : ''} 
+                 ${proj.hdBeforeImage ? `data-hd-before="${proj.hdBeforeImage}"` : ''}>
+              ${renderMedia(proj.image, `ambient-img ${proj.animation || ''}`, proj.title)}
+            </div>
+          `;
+        }
+
+        track.appendChild(card);
+      });
     });
 
-    // Re-bind hover cursors for the new dynamic cards
-    const hoverElements = track.querySelectorAll('.project-showcase');
+    // Re-bind hover cursors for all the new dynamic cards
+    const hoverElements = document.querySelectorAll('.dynamic-card');
     const cursor = document.querySelector('.custom-cursor');
     hoverElements.forEach(el => {
       el.addEventListener('mouseenter', () => {
@@ -398,7 +405,7 @@ async function loadDynamicGallery() {
     });
 
     // Re-bind slider handles for new dynamic cards (sliding class hides custom cursor)
-    const newHandles = track.querySelectorAll('.slider-handle');
+    const newHandles = document.querySelectorAll('.slider-handle');
     newHandles.forEach(el => {
       el.addEventListener('mouseenter', () => {
         if (cursor) {
@@ -418,8 +425,9 @@ async function loadDynamicGallery() {
     cards3D = document.querySelectorAll('.glass-card, .project-showcase, .skill-card');
 
     // Re-bind newly injected comparison sliders
-    if (typeof bindSliders === 'function') bindSliders(track);
-    if (typeof bindLightbox === 'function') bindLightbox(track);
+    const galleries = document.querySelectorAll('.gallery-track');
+    if (typeof bindSliders === 'function') galleries.forEach(track => bindSliders(track));
+    if (typeof bindLightbox === 'function') galleries.forEach(track => bindLightbox(track));
 
     // Apply strict mathematical geometry limits to prevent mobile CSS squishing
     if (typeof calculateCardDimensions === 'function') calculateCardDimensions();
@@ -723,7 +731,7 @@ function initLightbox() {
           const clonedSlider = slider.cloneNode(true);
           clonedSlider.classList.remove('bound');
 
-          const ratioStr = card.style.getPropertyValue('--card-ratio') || '16/9';
+          const ratioStr = card.dataset.hdRatio || card.style.getPropertyValue('--card-ratio') || '16/9';
           let [rw, rh] = ratioStr.split('/').map(Number);
           if (!rw || !rh) { rw = 16; rh = 9; }
           const ratio = rw / rh;
@@ -789,35 +797,103 @@ function initLightbox() {
         } else {
           const mediaContainer = card.querySelector('.media-container');
           if (!mediaContainer) return;
-          let media = mediaContainer.querySelector('img, video');
-          if (!media) return;
 
-          const clonedMedia = media.cloneNode(true);
-          clonedMedia.className = '';
+          if (mediaContainer.dataset.hdBefore) {
+            // Secretly construct a full slider for the lightbox since the card itself is static
+            const newSlider = document.createElement('div');
+            newSlider.className = 'comparison-slider';
+            
+            // Extract ratio from parent dynamic card for this manual slider build
+            const ratioStr = card.dataset.hdRatio || card.style.getPropertyValue('--card-ratio') || '16/9';
+            let [rw, rh] = ratioStr.split('/').map(Number);
+            if (!rw || !rh) { rw = 16; rh = 9; }
+            const ratio = rw / rh;
 
-          // HD Image swapping with Progressive Loading
-          if (mediaContainer.dataset.hd) {
-            if (clonedMedia.tagName.toLowerCase() === 'img') {
-              const loader = document.createElement('div');
-              loader.className = 'hd-loader';
-              content.appendChild(loader); // Append loader to content, it will be removed after image loads
+            let w = window.innerWidth * 0.95;
+            let h = w / ratio;
 
-              const loadHd = () => {
-                const hdImg = new Image();
-                hdImg.onload = () => {
-                  clonedMedia.src = hdImg.src;
-                  loader.remove();
-                };
-                hdImg.src = mediaContainer.dataset.hd;
-              };
-
-              if (clonedMedia.complete) loadHd();
-              else { clonedMedia.onload = loadHd; clonedMedia.onerror = loadHd; }
-            } else if (clonedMedia.tagName.toLowerCase() === 'video') {
-              clonedMedia.src = mediaContainer.dataset.hd;
+            const maxH = window.innerHeight * 0.95;
+            if (h > maxH) {
+              h = maxH;
+              w = h * ratio;
             }
+
+            newSlider.style.width = `${Math.floor(w)}px`;
+            newSlider.style.height = `${Math.floor(h)}px`;
+            newSlider.style.maxWidth = 'none';
+            newSlider.style.maxHeight = 'none';
+            newSlider.style.aspectRatio = 'auto'; 
+
+            newSlider.innerHTML = `
+              <div class="before-image"><img src=""></div>
+              <div class="after-image"><img src=""></div>
+              <div class="slider-handle"></div>
+            `;
+            const beforeMedia = newSlider.querySelector('.before-image img');
+            const afterMedia = newSlider.querySelector('.after-image img');
+            
+            const loaderBefore = document.createElement('div');
+            loaderBefore.className = 'hd-loader';
+            newSlider.querySelector('.before-image').appendChild(loaderBefore);
+
+            const loadHdBefore = () => {
+              const hdImg = new Image();
+              hdImg.onload = () => {
+                beforeMedia.src = hdImg.src;
+                loaderBefore.remove();
+              };
+              hdImg.src = mediaContainer.dataset.hdBefore;
+            };
+            loadHdBefore();
+            
+            const loaderAfter = document.createElement('div');
+            loaderAfter.className = 'hd-loader';
+            newSlider.querySelector('.after-image').appendChild(loaderAfter);
+
+            const loadHdAfter = () => {
+              const hdImg = new Image();
+              hdImg.onload = () => {
+                afterMedia.src = hdImg.src;
+                loaderAfter.remove();
+              };
+              hdImg.src = mediaContainer.dataset.hd || mediaContainer.querySelector('img, video').src;
+            };
+            loadHdAfter();
+            
+            content.appendChild(newSlider);
+            if (typeof bindSliders === 'function') bindSliders(modal);
+
+          } else {
+            let media = mediaContainer.querySelector('img, video');
+            if (!media) return;
+
+            const clonedMedia = media.cloneNode(true);
+            clonedMedia.className = '';
+
+            // HD Image swapping with Progressive Loading
+            if (mediaContainer.dataset.hd) {
+              if (clonedMedia.tagName.toLowerCase() === 'img') {
+                const loader = document.createElement('div');
+                loader.className = 'hd-loader';
+                content.appendChild(loader); // Append loader to content, it will be removed after image loads
+
+                const loadHd = () => {
+                  const hdImg = new Image();
+                  hdImg.onload = () => {
+                    clonedMedia.src = hdImg.src;
+                    loader.remove();
+                  };
+                  hdImg.src = mediaContainer.dataset.hd;
+                };
+
+                if (clonedMedia.complete) loadHd();
+                else { clonedMedia.onload = loadHd; clonedMedia.onerror = loadHd; }
+              } else if (clonedMedia.tagName.toLowerCase() === 'video') {
+                clonedMedia.src = mediaContainer.dataset.hd;
+              }
+            }
+            content.appendChild(clonedMedia);
           }
-          content.appendChild(clonedMedia);
         }
 
         modal.classList.add('active');
@@ -987,7 +1063,7 @@ const AudioManager = {
     click: null,
     glitch: null
   },
-  
+
   // Custom Overlapping Loop Settings mapping directly to seconds
   ambientSettings: {
     transitionDelaySeconds: 53.00,  // End of ambient 1 / Start of ambient 2
@@ -1004,11 +1080,11 @@ const AudioManager = {
     // We use two tracks so they can overlap and play simultaneously
     this.sounds.ambient2A = new Audio('/audio/ambient2.mp3');
     this.sounds.ambient2A.loop = false;
-    this.sounds.ambient2A.volume = 0.1;
-    
+    this.sounds.ambient2A.volume = 0.3;
+
     this.sounds.ambient2B = new Audio('/audio/ambient2.mp3');
     this.sounds.ambient2B.loop = false;
-    this.sounds.ambient2B.volume = 0.1;
+    this.sounds.ambient2B.volume = 0.3;
 
     this.sounds.lantern = new Audio('/audio/lantern-burn.mp3');
     this.sounds.lantern.loop = true;
@@ -1022,7 +1098,7 @@ const AudioManager = {
     this.sounds.click.volume = 0.8;
 
     this.sounds.glitch = new Audio('/audio/glitch.mp3');
-    this.sounds.glitch.volume = 0.7;
+    this.sounds.glitch.volume = 0.6;
 
     // Listen for the first user interaction to unlock audio engine safely
     window.addEventListener('click', () => {
@@ -1030,7 +1106,7 @@ const AudioManager = {
         this.hasInteracted = true;
         this.isMuted = false;
         this.play('ambient1');
-        
+
         // Adjustable seconds before the looping ambient2 starts
         setTimeout(() => {
           this.playOverlappingAmbient2();
@@ -1043,13 +1119,13 @@ const AudioManager = {
 
   playOverlappingAmbient2() {
     if (this.isMuted) return;
-    
+
     // Play the current track
     this.play(this.nextAmbient2Track);
-    
+
     // Swap tracks for the next loop so they can overlap
     this.nextAmbient2Track = this.nextAmbient2Track === 'ambient2A' ? 'ambient2B' : 'ambient2A';
-    
+
     // Schedule the next track to start overlapping based on the delay setting
     setTimeout(() => {
       this.playOverlappingAmbient2();
