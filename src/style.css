@@ -1168,12 +1168,12 @@ footer {
   }
 
   .gallery-header {
-    top: 3%;
+    top: 6%;
     /* Move header closer to top */
   }
 
   .gallery-header p {
-    transform: translateY(15px);
+    transform: translateY(10px);
   }
 
   .social-links {
@@ -1185,19 +1185,16 @@ footer {
     font-size: 0.75rem;
   }
 
-  .gallery-header h2 {
-    translate: 0 1rem;
-  }
-
   .project-showcase {
     width: 95vw;
     padding: 0.4rem;
-    scale: 1.3;
+    scale: 1.25;
     /* Minimal padding for maximum screen usage */
   }
 
   .project-showcase h3 {
     font-size: 0.8rem;
+    transform: scaleY(1.3);
     /* Even smaller title */
     margin-bottom: 1.3rem;
   }
