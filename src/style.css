@@ -1190,16 +1190,17 @@ footer {
   }
 
   .project-showcase {
-    width: 95vw;
+    width: 100vw;
+height: 100vw;
     padding: 0.8rem;
-    scale: 1.25;
+    scale: 2;
     /* Minimal padding for maximum screen usage */
   }
 
   .project-showcase h3 {
     font-size: 1.15rem;
     /* Even smaller title */
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
   }
 
   .gallery-track {
