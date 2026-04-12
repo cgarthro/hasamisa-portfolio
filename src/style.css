@@ -1186,12 +1186,13 @@ footer {
   }
 
   .gallery-header h2 {
-    translate: 0 2rem;
+    translate: 0 1rem;
   }
 
   .project-showcase {
     width: 100vw;
-    padding: 0.2rem;
+    padding: 0.4rem;
+scale: 1.3;
     /* Minimal padding for maximum screen usage */
   }
 
