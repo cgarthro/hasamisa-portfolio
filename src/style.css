@@ -1144,7 +1144,7 @@ footer {
     /* Safely scale the entire pill down 15% */
     width: max-content !important;
     /* Force it to hug the text instead of stretching */
-    top: 5px;
+    top: 1px;
   }
 
   .dock-wrapper {
@@ -1168,12 +1168,12 @@ footer {
   }
 
   .gallery-header {
-    top: 6%;
+    top: 8%;
     /* Move header closer to top */
   }
 
   .gallery-header p {
-    transform: translateY(10px);
+    transform: translateY(5px);
   }
 
   .social-links {
@@ -1202,6 +1202,9 @@ footer {
   .gallery-track {
     margin-top: 2vh;
     /* Shift entire track up */
+  }
+  .slider-handle {
+  scale: 0.7;
   }
 }
 
