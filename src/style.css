@@ -1057,10 +1057,22 @@ footer {
   .gallery-track {
     gap: 5vw;
     padding: 0 10vw;
+    margin-top: 6vh;
+    /* Bring track up slightly */
   }
 
+
+
   .project-showcase {
-    width: 85vw;
+    width: 100vw;
+    padding: 1.2rem;
+    /* Reduced from 2rem */
+  }
+
+  .project-showcase h3 {
+    font-size: 1.4rem;
+    /* Shrink titles */
+    margin-bottom: 1.5rem;
   }
 
   /* Skills / Games Sections */
@@ -1132,7 +1144,7 @@ footer {
     /* Safely scale the entire pill down 15% */
     width: max-content !important;
     /* Force it to hug the text instead of stretching */
-    top: 15px;
+    top: 5px;
   }
 
   .dock-wrapper {
@@ -1155,6 +1167,15 @@ footer {
     font-size: 1.5rem;
   }
 
+  .gallery-header {
+    top: 8%;
+    /* Move header closer to top */
+  }
+
+  .gallery-header p {
+    transform: translateY(20px);
+  }
+
   .social-links {
     gap: 0.5rem;
   }
@@ -1162,6 +1183,28 @@ footer {
   .social-icon {
     padding: 0.5rem 0.8rem;
     font-size: 0.75rem;
+  }
+
+  .gallery-header h2 {
+    translate: 0 1.5rem;
+  }
+
+  .project-showcase {
+    width: 95vw;
+    padding: 0.8rem;
+    scale: 1.15;
+    /* Minimal padding for maximum screen usage */
+  }
+
+  .project-showcase h3 {
+    font-size: 1.15rem;
+    /* Even smaller title */
+    margin-bottom: 0.8rem;
+  }
+
+  .gallery-track {
+    margin-top: 4vh;
+    /* Shift entire track up */
   }
 }
 
