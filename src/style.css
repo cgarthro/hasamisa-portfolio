@@ -1194,7 +1194,7 @@ footer {
 
   .project-showcase h3 {
     font-size: 0.8rem;
-    transform: scaleY(1.3);
+    transform: scaleY(1.1);
     /* Even smaller title */
     margin-bottom: 1.3rem;
   }
@@ -1204,7 +1204,8 @@ footer {
     /* Shift entire track up */
   }
   .slider-handle {
-  scale: 0.7;
+  scale: 0.8;
+  transform: translate(-1px, -1px);
   }
 }
 
