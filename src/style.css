@@ -659,7 +659,7 @@ body:has(.nav-switcher:hover) .custom-cursor .cursor-lens {
   width: 60vw;
   max-width: 1000px;
   flex-shrink: 0;
-  padding: 2rem;
+  padding: 1rem;
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   transform-style: preserve-3d;
   position: relative;
@@ -1053,25 +1053,39 @@ footer {
     font-size: 0.9rem;
   }
 
+  .card-icon {
+    scale: 0.7;
+    top: 0 !important;
+    right: 0 !important;
+  }
+
   /* Gallery: keep horizontal 3D scroll, just scale cards down */
   .gallery-track {
     gap: 5vw;
     padding: 0 10vw;
     margin-top: 6vh;
+    font-size: 1.5rem;
     /* Bring track up slightly */
   }
 
+  .gallery-header {
+    top: 10%;
+  }
 
+  .gallery-header h2 {
+    font-size: 2.2rem;
+  }
 
   .project-showcase {
     width: 100vw;
-    padding: 1.2rem;
+    padding: 0.6rem;
+    scale: 1.15;
     /* Reduced from 2rem */
   }
 
   .project-showcase h3 {
     font-size: 1.4rem;
-    /* Shrink titles */
+    transform: scaleY(1.1);
     margin-bottom: 1.5rem;
   }
 
@@ -1167,11 +1181,6 @@ footer {
     font-size: 1.5rem;
   }
 
-  .gallery-header {
-    top: 8%;
-    /* Move header closer to top */
-  }
-
   .gallery-header p {
     transform: translateY(5px);
   }
@@ -1194,18 +1203,25 @@ footer {
 
   .project-showcase h3 {
     font-size: 0.8rem;
-    transform: scaleY(1.1);
     /* Even smaller title */
     margin-bottom: 1.3rem;
+  }
+
+  .gallery-header {
+    top: 8%;
   }
 
   .gallery-track {
     margin-top: 2vh;
     /* Shift entire track up */
   }
+
   .slider-handle {
-  scale: 0.8;
-  transform: translate(-5px, -5px);
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+
+  .lightbox-close {
+    scale: 0.8;
   }
 }
 

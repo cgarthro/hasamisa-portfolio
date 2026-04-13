@@ -79,6 +79,11 @@
       "image": "https://cgarthro.carrd.co/assets/images/gallery05/2426cf28.jpg",
       "animation": "wobble",
       "aspectRatio": "16/9"
+    },
+    {
+      "title": "New Year Banner",
+      "image": "/images/newyear.mp4",
+      "aspectRatio": "16/9"
     }
   ]
 }

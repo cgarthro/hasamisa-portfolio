@@ -683,17 +683,6 @@ function initLightbox() {
 
   closeBtn.addEventListener('click', closeLightbox);
 
-  let modalDownX = 0, modalDownY = 0;
-  modal.addEventListener('mousedown', (e) => {
-    modalDownX = e.clientX;
-    modalDownY = e.clientY;
-  });
-  modal.addEventListener('click', (e) => {
-    if (e.target !== modal) return;
-    if (Math.abs(e.clientX - modalDownX) > 5 || Math.abs(e.clientY - modalDownY) > 5) return;
-    closeLightbox();
-  });
-
   window.bindLightbox = (scope = document) => {
     const cards = scope.querySelectorAll('.project-showcase:not(.lightbox-bound)');
     cards.forEach(card => {
@@ -1040,6 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const correspondingRadio = document.querySelector(`.nav-switcher input[value="${id}"]`);
         if (correspondingRadio) {
           correspondingRadio.checked = true;
+          correspondingRadio.dispatchEvent(new Event('change'));
         }
       }
     });
