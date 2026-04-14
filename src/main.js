@@ -1151,20 +1151,35 @@ const AudioManager = {
     }
   },
 
-  toggleMute() {
+    toggleMute() {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {
       Object.keys(this.sounds).forEach(key => this.stop(key));
     } else {
       this.play('ambient');
-      this.play('lantern');
     }
   }
 };
 
-// Initialize on Load
-window.addEventListener('DOMContentLoaded', () => {
-  AudioManager.init();
+// --- LANDING OVERLAY LOGIC --- //
+document.addEventListener('DOMContentLoaded', () => {
+  const landingOverlay = document.getElementById('landing-overlay');
+  const startBtn = document.getElementById('start-btn');
+
+  if (startBtn && landingOverlay) {
+    startBtn.addEventListener('click', () => {
+      // Initialize Audio on User Interaction
+      if (typeof AudioManager !== 'undefined') {
+        AudioManager.init();
+      }
+      
+      // Fade out and remove overlay
+      landingOverlay.classList.add('fade-out');
+      setTimeout(() => {
+        landingOverlay.remove();
+      }, 800);
+    });
+  }
 });
 
 // --- SETTINGS PANEL LOGIC --- //
@@ -1192,9 +1207,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Moth Particles Logic
-    toggleMoths.addEventListener('change', (e) => {
-      window.PARTICLES_ENABLED = e.target.checked;
-    });
+    if (toggleMoths) {
+      toggleMoths.addEventListener('change', (e) => {
+        window.PARTICLES_ENABLED = e.target.checked;
+      });
+    }
 
     // Custom Cursor Logic
     const styleBlock = document.createElement('style');
@@ -1249,14 +1266,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Performance Mode Logic
-    togglePerf.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        document.body.classList.add('perf-mode');
-      } else {
-        document.body.classList.remove('perf-mode');
-      }
-    });
+    if (togglePerf) {
+      togglePerf.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          document.body.classList.add('perf-mode');
+        } else {
+          document.body.classList.remove('perf-mode');
+        }
+      });
+    }
   }
 });
-
-

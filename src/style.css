@@ -1721,12 +1721,82 @@ body.perf-mode .project-showcase {
   transform-style: flat !important;
 }
 
-@keyframes moveBackground {
-  from {
-    background-position: 0% 0%;
-  }
-
-  to {
-    background-position: 0% -1500%;
-  }
+/* --- LANDING OVERLAY --- */
+.landing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 5, 8, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
 }
+
+.landing-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.overlay-content {
+  max-width: 500px;
+  width: 90%;
+  padding: 3rem 2rem;
+  text-align: center;
+  border: 1px solid rgba(12, 174, 185, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+  animation: overlayPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes overlayPop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.overlay-title {
+  font-size: 2.2rem;
+  color: var(--cyan-light);
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px var(--cyan-glow);
+}
+
+.overlay-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: var(--text-main);
+}
+
+.overlay-subtext {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #ff3366;
+  margin-bottom: 2.5rem;
+  padding: 1rem;
+  background: rgba(255, 51, 102, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #ff3366;
+}
+
+.landing-start-btn {
+  margin: 0 auto;
+  min-width: 200px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@media screen and (max-width: 768px) {
+  .overlay-title { font-size: 1.8rem; }
+  .overlay-text { font-size: 1rem; }
+  .overlay-content { padding: 2rem 1.5rem; }
+}
