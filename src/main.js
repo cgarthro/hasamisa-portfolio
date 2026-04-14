@@ -69,7 +69,7 @@ const createCursor = () => {
     cursor.style.top = `${e.clientY}px`;
   });
 
-  const hoverElements = document.querySelectorAll('a, button, .skill-card, .project-showcase, input');
+  const hoverElements = document.querySelectorAll('a, button, .skill-card, .project-showcase, input, .settings-wrapper, .settings-dropdown');
   hoverElements.forEach(el => {
     el.addEventListener('mouseenter', () => {
       cursor.classList.add('hover');
@@ -300,7 +300,14 @@ class Moth {
 for (let i = 0; i < NUM_AMBIENT; i++) moths.push(new Moth(false));
 for (let i = 0; i < NUM_SWARM; i++) moths.push(new Moth(true));
 
+window.PARTICLES_ENABLED = true;
 function animateMoths() {
+  if (!window.PARTICLES_ENABLED) {
+    ctxBack.clearRect(0, 0, width, height);
+    ctxFront.clearRect(0, 0, width, height);
+    requestAnimationFrame(animateMoths);
+    return;
+  }
   mouseSpeed *= 0.92;
   ctxBack.globalAlpha = 1;
   ctxFront.globalAlpha = 1;
@@ -1159,3 +1166,97 @@ const AudioManager = {
 window.addEventListener('DOMContentLoaded', () => {
   AudioManager.init();
 });
+
+// --- SETTINGS PANEL LOGIC --- //
+document.addEventListener('DOMContentLoaded', () => {
+  const settingsTrigger = document.getElementById('settings-trigger');
+  const settingsDropdown = document.querySelector('.settings-dropdown');
+  const toggleMoths = document.getElementById('toggle-moths');
+  const toggleCursors = document.getElementById('toggle-cursors');
+  const togglePerf = document.getElementById('toggle-perf');
+  const ambientVolSlider = document.getElementById('ambient-vol');
+  const sfxVolSlider = document.getElementById('sfx-vol');
+
+  if (settingsTrigger) {
+    // Toggle Dropdown
+    settingsTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsDropdown.classList.toggle('active');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!settingsDropdown.contains(e.target) && !settingsTrigger.contains(e.target)) {
+        settingsDropdown.classList.remove('active');
+      }
+    });
+
+    // Moth Particles Logic
+    toggleMoths.addEventListener('change', (e) => {
+      window.PARTICLES_ENABLED = e.target.checked;
+    });
+
+    // Custom Cursor Logic
+    const styleBlock = document.createElement('style');
+    styleBlock.innerHTML = '* { cursor: none !important; }';
+    document.head.appendChild(styleBlock);
+    
+    if (toggleCursors) {
+      toggleCursors.addEventListener('change', (e) => {
+        const customCursor = document.querySelector('.custom-cursor');
+        if (e.target.checked) {
+          if (customCursor) customCursor.style.display = 'block';
+          styleBlock.innerHTML = '* { cursor: none !important; }';
+        } else {
+          if (customCursor) customCursor.style.display = 'none';
+          styleBlock.innerHTML = `
+            * { cursor: auto !important; }
+            a, a *, button, button *, input:not([type="range"]), .settings-wrapper, .settings-wrapper *, .lightbox-close, .skill-card, .menu, .dock img, .switcher__option, .switcher__text, .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch, .toggle-slider, .project-showcase { cursor: pointer !important; }
+            input[type="range"], .slider-handle { cursor: ew-resize !important; }
+          `;
+        }
+      });
+    }
+    
+    // Audio Sliders Logic
+    if (typeof AudioManager !== 'undefined') {
+      const baseVolumes = {
+        ambient1: 0.5, ambient2A: 0.3, ambient2B: 0.3,
+        lantern: 0.5, hover: 0.4, click: 0.8, glitch: 0.6
+      };
+
+      if (ambientVolSlider) {
+        ambientVolSlider.addEventListener('input', (e) => {
+           const masterVol = parseFloat(e.target.value); 
+           ['ambient1', 'ambient2A', 'ambient2B'].forEach(key => {
+             if (AudioManager.sounds[key]) {
+               AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
+             }
+           });
+        });
+      }
+
+      if (sfxVolSlider) {
+        sfxVolSlider.addEventListener('input', (e) => {
+           const masterVol = parseFloat(e.target.value); 
+           ['lantern', 'hover', 'click', 'glitch'].forEach(key => {
+             if (AudioManager.sounds[key]) {
+               AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
+             }
+           });
+        });
+      }
+    }
+
+    // Performance Mode Logic
+    togglePerf.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.body.classList.add('perf-mode');
+      } else {
+        document.body.classList.remove('perf-mode');
+      }
+    });
+  }
+});
+
+

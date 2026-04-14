@@ -1134,6 +1134,10 @@ footer {
     aspect-ratio: 4/3;
   }
 
+  .settings-container {
+    transform: scale(0.8) translate(20px, 80px);
+  }
+
   /* Footer */
   footer {
     padding: 2.5rem 1rem;
@@ -1159,6 +1163,10 @@ footer {
     width: max-content !important;
     /* Force it to hug the text instead of stretching */
     top: 1px;
+  }
+
+  .settings-container {
+    transform: scale(0.65) translate(30px, 40px);
   }
 
   .dock-wrapper {
@@ -1521,6 +1529,196 @@ footer {
 
 .button:hover svg {
   transform: scale(0.95);
+}
+
+/* --- SETTINGS PANEL --- */
+.settings-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.settings-wrapper {
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
+  border-radius: 50% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Override Liquid Glass box shadow for button shape */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.settings-wrapper .liquidGlass-text,
+.settings-wrapper .liquidGlass-effect,
+.settings-wrapper .liquidGlass-tint,
+.settings-wrapper .liquidGlass-shine {
+  border-radius: 50% !important;
+}
+
+.settings-btn-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#settings-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--cyan-light);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 0 5px var(--cyan-glow));
+}
+
+.settings-wrapper:hover #settings-icon {
+  transform: rotate(90deg);
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 250px;
+  padding: 1.5rem;
+  border-radius: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--cyan-dark);
+}
+
+.settings-dropdown.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.settings-header h3 {
+  font-size: 1.2rem;
+  color: var(--cyan-light);
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.setting-item.volume-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.setting-item.volume-container input[type="range"] {
+  width: 100%;
+  cursor: ew-resize !important;
+  accent-color: var(--cyan-light);
+}
+
+.setting-item.highlight-setting {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(12, 174, 185, 0.3);
+}
+
+.setting-item small {
+  color: #ff3366;
+  font-size: 0.75rem;
+  display: block;
+}
+
+/* Custom Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .4s;
+  border-radius: 24px;
+  border: 1px solid rgba(12, 174, 185, 0.3);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-dim);
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+  background-color: rgba(12, 174, 185, 0.3);
+  border-color: var(--cyan-light);
+}
+
+input:checked+.toggle-slider:before {
+  transform: translateX(20px);
+  background-color: var(--cyan-light);
+  box-shadow: 0 0 10px var(--cyan-glow);
+}
+
+input:checked+.perf-slider {
+  background-color: rgba(255, 51, 102, 0.2);
+  border-color: #ff3366;
+}
+
+input:checked+.perf-slider:before {
+  background-color: #ff3366;
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+}
+
+/* --- PERFORMANCE MODE SCALEDOWNS --- */
+body.perf-mode .glass-card,
+body.perf-mode .nav-switcher,
+body.perf-mode .settings-dropdown,
+body.perf-mode .liquidGlass-effect {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(0, 5, 8, 0.95) !important;
+}
+
+body.perf-mode .corner-glow {
+  display: none !important;
+}
+
+body.perf-mode .project-showcase {
+  transform-style: flat !important;
 }
 
 @keyframes moveBackground {
