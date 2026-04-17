@@ -1165,9 +1165,26 @@ const AudioManager = {
 document.addEventListener('DOMContentLoaded', () => {
   const landingOverlay = document.getElementById('landing-overlay');
   const startBtn = document.getElementById('start-btn');
+  const cursor = document.querySelector('.custom-cursor');
+
+  if (landingOverlay) {
+    // Lock scroll while overlay is visible
+    document.body.style.overflow = 'hidden';
+  }
 
   if (startBtn && landingOverlay) {
+    // Show rotating lens cursor on hover over the start button
+    startBtn.addEventListener('mouseenter', () => {
+      if (cursor) cursor.classList.add('hover');
+    });
+    startBtn.addEventListener('mouseleave', () => {
+      if (cursor) cursor.classList.remove('hover');
+    });
+
     startBtn.addEventListener('click', () => {
+      // Unlock scroll
+      document.body.style.overflow = '';
+
       // Initialize Audio on User Interaction
       if (typeof AudioManager !== 'undefined') {
         AudioManager.init();

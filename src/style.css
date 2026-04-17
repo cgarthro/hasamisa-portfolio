@@ -1735,6 +1735,7 @@ body.perf-mode .project-showcase {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
   transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
 }
 
@@ -1760,24 +1761,25 @@ body.perf-mode .project-showcase {
 }
 
 .overlay-title {
-  font-size: 2.2rem;
+  font-size: 1.3rem;
   color: var(--cyan-light);
-  margin-bottom: 1.5rem;
-  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  text-shadow: 0 0 15px var(--cyan-glow);
+  opacity: 0.6;
+  text-shadow: 0 0 10px var(--cyan-glow);
 }
 
 .overlay-text {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
   color: var(--text-main);
 }
 
 .overlay-subtext {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.6;
   color: #ff3366;
   margin-bottom: 2.5rem;
   padding: 1rem;
@@ -1788,15 +1790,20 @@ body.perf-mode .project-showcase {
 
 .landing-start-btn {
   margin: 0 auto;
-  min-width: 200px;
-  padding: 1rem 2rem;
-  font-size: 1rem;
+  min-width: 260px;
+  padding: 1.4rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 3px;
+  text-align: center;
+  justify-content: center;
 }
 
 @media screen and (max-width: 768px) {
-  .overlay-title { font-size: 1.8rem; }
-  .overlay-text { font-size: 1rem; }
+  .overlay-title { font-size: 1rem; }
+  .overlay-text { font-size: 1.1rem; }
+  .overlay-subtext { font-size: 0.95rem; }
   .overlay-content { padding: 2rem 1.5rem; }
+  .landing-start-btn { min-width: 220px; padding: 1.2rem 2rem; }
 }
