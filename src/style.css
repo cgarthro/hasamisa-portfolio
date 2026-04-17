@@ -1310,7 +1310,7 @@ footer {
 
 .lightbox-close {
   position: absolute;
-  top: 10px;
+  top: 40px;
   right: 10px;
   width: 40px;
   height: 40px;
@@ -1324,7 +1324,7 @@ footer {
   cursor: none;
   transition: transform 0.2s, background 0.2s;
   z-index: 100;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--cyan-dark);
 }
 
@@ -1756,8 +1756,15 @@ body.perf-mode .project-showcase {
 }
 
 @keyframes overlayPop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .overlay-title {
@@ -1801,9 +1808,60 @@ body.perf-mode .project-showcase {
 }
 
 @media screen and (max-width: 768px) {
-  .overlay-title { font-size: 1rem; }
-  .overlay-text { font-size: 1.1rem; }
-  .overlay-subtext { font-size: 0.95rem; }
-  .overlay-content { padding: 2rem 1.5rem; }
-  .landing-start-btn { min-width: 220px; padding: 1.2rem 2rem; }
-}
+  .overlay-title {
+    font-size: 1rem;
+  }
+
+  .overlay-text {
+    font-size: 1.1rem;
+  }
+
+  .overlay-subtext {
+    font-size: 0.95rem;
+  }
+
+  .overlay-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .landing-start-btn {
+    min-width: 220px;
+    padding: 1.2rem 2rem;
+  }
+}
+
+/* --- YOUTUBE EMBED SYSTEM --- */
+.yt-play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.yt-play-overlay svg {
+  width: 68px;
+  height: 48px;
+  filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.7));
+}
+
+.project-showcase:hover .yt-play-overlay {
+  opacity: 1;
+}
+
+/* Dim the thumbnail slightly on hover to make the play button pop */
+.project-showcase:hover .media-container img,
+.project-showcase:hover .media-container video {
+  filter: brightness(0.75);
+  transition: filter 0.3s ease;
+}
+
+.yt-embed-frame {
+  display: block;
+  border: none;
+  border-radius: 8px;
+  background: #000;
+}

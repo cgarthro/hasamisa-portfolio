@@ -342,6 +342,15 @@ async function loadDynamicGallery() {
       return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
     };
 
+    // Extract YouTube video ID from any YouTube URL format
+    const getYouTubeId = (url) => {
+      if (!url) return null;
+      const match = url.match(
+        /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+      );
+      return match ? match[1] : null;
+    };
+
     Object.keys(categories).forEach(categoryKey => {
       const track = document.getElementById(`${categoryKey}-track`);
       if (!track) return;
@@ -359,9 +368,24 @@ async function loadDynamicGallery() {
         const hasLink = !!proj.link;
         if (hasLink) card.dataset.link = proj.link;
 
-        const iconHtml = hasLink
-          ? `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`
-          : `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
+        // YouTube embed support
+        const youtubeId = proj.youtubeUrl ? getYouTubeId(proj.youtubeUrl) : null;
+        if (youtubeId) card.dataset.youtube = youtubeId;
+
+        // Choose icon: YouTube play > external link > expand
+        let iconHtml;
+        if (youtubeId) {
+          iconHtml = `<div class="card-icon yt-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg></div>`;
+        } else if (hasLink) {
+          iconHtml = `<div class="card-icon link-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/></svg></div>`;
+        } else {
+          iconHtml = `<div class="card-icon expand-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z"/></svg></div>`;
+        }
+
+        // YouTube play button overlay
+        const ytOverlay = youtubeId
+          ? `<div class="yt-play-overlay"><svg viewBox="0 0 68 48"><path d="M66.52,7.74C65.66,4.54 63.16,2.04 59.96,1.18C54.76,0 34,0 34,0S13.24,0 8.04,1.18C4.84,2.04 2.34,4.54 1.48,7.74C0.3,12.94 0.3,24 0.3,24S0.3,35.06 1.48,40.26C2.34,43.46 4.84,45.96 8.04,46.82C13.24,48 34,48 34,48S54.76,48 59.96,46.82C63.16,45.96 65.66,43.46 66.52,40.26C67.7,35.06 67.7,24 67.7,24S67.7,12.94 66.52,7.74Z" fill="#FF0000" fill-opacity="0.8"/><path d="M 45,24 27,14 27,34" fill="#fff"/></svg></div>`
+          : '';
 
         if (proj.beforeImage) {
           card.innerHTML = `
@@ -378,6 +402,7 @@ async function loadDynamicGallery() {
         } else {
           card.innerHTML = `
             ${iconHtml}
+            ${ytOverlay}
             <h3>${proj.title}</h3>
             <div class="media-container" 
                  ${proj.hdImage ? `data-hd="${proj.hdImage}"` : ''} 
@@ -679,8 +704,34 @@ function initLightbox() {
   const closeBtn = modal.querySelector('.lightbox-close');
   const content = modal.querySelector('.lightbox-content');
 
+  // Helper: duck all audio to 0 and save volumes for restore
+  const duckAudio = () => {
+    if (typeof AudioManager === 'undefined') return;
+    AudioManager.lightboxOpen = true;
+    AudioManager._savedVolumes = {};
+    Object.keys(AudioManager.sounds).forEach(key => {
+      if (AudioManager.sounds[key]) {
+        AudioManager._savedVolumes[key] = AudioManager.sounds[key].volume;
+        AudioManager.sounds[key].volume = 0;
+      }
+    });
+  };
+
+  // Helper: restore all audio volumes after lightbox close
+  const restoreAudio = () => {
+    if (typeof AudioManager === 'undefined' || AudioManager.isMuted) return;
+    AudioManager.lightboxOpen = false;
+    Object.keys(AudioManager.sounds).forEach(key => {
+      if (AudioManager.sounds[key] && AudioManager._savedVolumes && AudioManager._savedVolumes[key] !== undefined) {
+        AudioManager.sounds[key].volume = AudioManager._savedVolumes[key];
+      }
+    });
+    AudioManager._savedVolumes = {};
+  };
+
   const closeLightbox = () => {
     modal.classList.remove('active');
+    restoreAudio();
     setTimeout(() => {
       Array.from(content.children).forEach(child => {
         if (!child.classList.contains('lightbox-close')) child.remove();
@@ -713,6 +764,38 @@ function initLightbox() {
         // Routing Logic
         if (card.dataset.link) {
           window.location.href = card.dataset.link;
+          return;
+        }
+
+        // YouTube Embed Lightbox
+        if (card.dataset.youtube) {
+          Array.from(content.children).forEach(child => {
+            if (!child.classList.contains('lightbox-close')) child.remove();
+          });
+
+          const ytId = card.dataset.youtube;
+          const ratioStr = card.style.getPropertyValue('--card-ratio') || '16/9';
+          const parts = ratioStr.split('/').map(Number);
+          const ratio = (parts[0] && parts[1]) ? parts[0] / parts[1] : 16 / 9;
+
+          let w = window.innerWidth * 0.95;
+          let h = w / ratio;
+          const maxH = window.innerHeight * 0.9;
+          if (h > maxH) { h = maxH; w = h * ratio; }
+
+          const iframe = document.createElement('iframe');
+          iframe.className = 'yt-embed-frame';
+          iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+          iframe.style.width = `${Math.floor(w)}px`;
+          iframe.style.height = `${Math.floor(h)}px`;
+          iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = '0';
+
+          content.appendChild(iframe);
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          duckAudio();
           return;
         }
 
@@ -894,6 +977,8 @@ function initLightbox() {
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Lock scroll
+        // Duck site audio if lightbox contains video (keeps audio in sync)
+        if (content.querySelector('video, iframe')) duckAudio();
 
         // Bind cursor hover for lightbox content (rotating lens inside, lantern outside)
         const cursorEl = document.querySelector('.custom-cursor');
@@ -1099,6 +1184,8 @@ const AudioManager = {
 
     // Listen for the first user interaction to unlock audio engine safely
     window.addEventListener('click', () => {
+      // Don't auto-start music if click is opening a lightbox
+      if (this.lightboxOpen) return;
       if (!this.hasInteracted) {
         this.hasInteracted = true;
         this.isMuted = false;
@@ -1294,3 +1381,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+

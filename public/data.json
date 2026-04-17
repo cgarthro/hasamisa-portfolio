@@ -64,19 +64,21 @@
     {
       "title": "Cloth Simulation",
       "image": "https://cgarthro.carrd.co/assets/images/gallery05/56f0388f.jpg",
-      "link": "https://youtube.com/shorts/RkGr7peq6OI?si=qxaV6cHWQr0HGhDu",
+      "youtubeUrl": "https://youtu.be/RkGr7peq6OI?si=psdelI5Dzmcmarih",
       "animation": "float",
       "aspectRatio": "9/16"
     },
     {
       "title": "Beach Cinematic",
       "image": "https://cgarthro.carrd.co/assets/images/gallery05/331e06be.jpg",
+      "youtubeUrl": "https://youtu.be/QqaGKIls0W8?si=iBXOdyG6ANbLpUJJ",
       "animation": "pulse",
       "aspectRatio": "16/9"
     },
     {
       "title": "Lavender Field March",
       "image": "https://cgarthro.carrd.co/assets/images/gallery05/2426cf28.jpg",
+      "youtubeUrl": "https://youtu.be/gcHNM7R8CM8?si=keTbZCN-rYAxhibr",
       "animation": "wobble",
       "aspectRatio": "16/9"
     },
