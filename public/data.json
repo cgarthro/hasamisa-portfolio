@@ -62,6 +62,13 @@
   ],
   "animations": [
     {
+      "title": "Car",
+      "image": "/images/car.png",
+      "youtubeUrl": "https://youtube.com/shorts/u1anqyf7RT8?si=xEDbU4UmKxp1wNPA",
+      "animation": "float",
+      "aspectRatio": "9/16"
+    },
+    {
       "title": "Cloth Simulation",
       "image": "https://cgarthro.carrd.co/assets/images/gallery05/56f0388f.jpg",
       "youtubeUrl": "https://youtu.be/RkGr7peq6OI?si=psdelI5Dzmcmarih",
@@ -87,5 +94,134 @@
       "image": "/images/newyear.mp4",
       "aspectRatio": "16/9"
     }
-  ]
+  ],
+  "projects": {
+    "proto": {
+      "titlePath1": "Proto: ",
+      "titlePath2": "Last Hope",
+      "meta": [
+        "Game Development",
+        "Unreal Engine 5",
+        "Action / Stealth"
+      ],
+      "heroBg": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
+      "visionTitle": "The Vision",
+      "visionText": "Proto: Last Hope is a passion project built on advanced Unreal Engine mechanics. Drawing on high-end 3D environments and rigorous optimization, the game bridges intense gameplay with breathtaking atmospheric rendering. The objective was to create a playable slice that demonstrates both technical art and engaging level design.",
+      "specs": [
+        {
+          "label": "Engine",
+          "val": "Unreal 5"
+        },
+        {
+          "label": "Lighting",
+          "val": "Lumen"
+        }
+      ],
+      "visionImage": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
+      "deepDiveTitle": "Technical Deep Dive",
+      "deepDiveText": "The core rendering utilizes Lumen for dynamic global illumination, allowing for moody, realistic stealth environments. High-fidelity custom particle systems were engineered to provide visceral feedback without sacrificing real-time performance on mid-tier hardware.",
+      "deepDiveImage": "https://via.placeholder.com/800x450/111111/0CAEB9?text=Engine+Setup+Shot",
+      "galleryText": "A collection of original models, animations, and environment props designed specifically for the Proto experience. Click to expand.",
+      "assets": [
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+1",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+1"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+2",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+2"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+3",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+3"
+        }
+      ],
+      "itchLink": "https://cgarthr0.itch.io/proto-lasthope"
+    },
+    "grandpa": {
+      "titlePath1": "Putting ",
+      "titlePath2": "Grandpa",
+      "titlePath3": " Back Together",
+      "meta": [
+        "Game Jam",
+        "Top 10 Finalist",
+        "Quick Prototyping"
+      ],
+      "heroBg": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "visionTitle": "The Jam",
+      "visionText": "Created for the India GameJam 2024, Putting Grandpa Back Together is a quirky, fast-paced puzzle/physics game where you literally have to assemble various limbs of a chaotic grandpa character. Placing Top 10 in the jam, it highlights an ability to conceptualize, model, code, and polish a core loop within a 48-hour pressure cooker.",
+      "specs": [
+        {
+          "label": "India GameJam Rank",
+          "val": "Top 10"
+        },
+        {
+          "label": "Development Time",
+          "val": "48 Hrs"
+        }
+      ],
+      "visionImage": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "deepDiveTitle": "Technical Deep Dive",
+      "deepDiveText": "The core puzzle mechanic relied heavily on custom ragdoll physics and joint detection. Fast iteration was key, requiring highly modular assets and a flexible game manager framework constructed from the ground up over a single weekend.",
+      "deepDiveImage": "https://via.placeholder.com/800x450/111111/0CAEB9?text=Physics+Debug+Shot",
+      "galleryText": "A collection of quickly modeled, textured, and rigged game jam assets. Click to expand.",
+      "assets": [
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Grandpa+Arm",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+1"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Grandpa+Leg",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+2"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Game+Environment",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+3"
+        }
+      ],
+      "itchLink": "https://shreyyasm.itch.io/putting-grandpa-back-together"
+    },
+    "ganja-mafia": {
+      "titlePath1": "Ganja ",
+      "titlePath2": "Mafia",
+      "meta": [
+        "Game Development",
+        "Action / Open World",
+        "Environment Art"
+      ],
+      "heroBg": "https://cgarthro.carrd.co/assets/images/gallery01/82299fdb.jpg",
+      "visionTitle": "The Concept",
+      "visionText": "Ganja Mafia is a stylized, action-packed indie game focusing on exploration and underground organization management. The visual target required blending gritty urban aesthetics with vibrant, neon-lit keyframe art.",
+      "specs": [
+        {
+          "label": "Genre",
+          "val": "Action"
+        },
+        {
+          "label": "Art Direction",
+          "val": "Stylized"
+        }
+      ],
+      "visionImage": "https://cgarthro.carrd.co/assets/images/gallery01/82299fdb.jpg",
+      "deepDiveTitle": "Environment Art Direction",
+      "deepDiveText": "Creating modular building kits and custom props was essential for memory efficiency, allowing us to build sprawling city blocks quickly. We used a custom post-processing volume to achieve the distinct, slightly cel-shaded cinematic look.",
+      "deepDiveImage": "https://via.placeholder.com/800x450/111111/0CAEB9?text=Street+Scene",
+      "galleryText": "A collection of building kits, props, and vehicle models prepared for the game environment. Click to expand.",
+      "assets": [
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=City+Prop",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+1"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Vehicle+Model",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+2"
+        },
+        {
+          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Weapon+Model",
+          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+3"
+        }
+      ],
+      "itchLink": "https://cgarthr0.itch.io/ganja-mafia"
+    }
+  }
 }

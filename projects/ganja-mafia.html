@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ganja Mafia | Hasamisa 3D</title>
+  <!-- Modern Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    /* Project Page Specific Layout */
+    .project-header {
+      height: 70vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 60px;
+      background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
+    }
+    .project-header-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.6) saturate(1.2);
+    }
+    .project-title-area h1 {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+    }
+    .project-meta {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--cyan-light);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .project-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+    .story-section {
+      margin-bottom: 120px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease-out;
+    }
+    .story-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .story-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: var(--cyan-primary);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .story-text {
+      line-height: 1.8;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+    .story-image {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      transition: transform 0.5s ease;
+    }
+    .story-image:hover {
+      transform: scale(1.02);
+    }
+    /* Simple Asset Grid for Case Studies */
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .asset-card {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--glass-border);
+    }
+    .asset-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      transition: filter 0.3s ease, transform 0.5s ease;
+    }
+    .asset-card:hover img {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+    .tech-specs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .spec-item {
+      padding: 20px;
+      background: rgba(12, 174, 185, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .spec-val {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--cyan-primary);
+    }
+    .spec-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    /* Call to Action Button */
+    .cta-container {
+      text-align: center;
+      margin-top: 60px;
+      margin-bottom: 60px;
+    }
+    @media (max-width: 768px) {
+      .story-grid { grid-template-columns: 1fr; gap: 30px; }
+      .project-title-area h1 { font-size: 2.8rem; }
+      .project-header { height: 50vh; padding: 30px; }
+    }
+  </style>
+</head>
+<body class="is-loading">
+  <!-- Moth Particle Swarm Canvases -->
+  <canvas id="moth-canvas-back"></canvas>
+  <canvas id="moth-canvas-front"></canvas>
+  
+  <div class="corner-glow top-left"></div>
+  <div class="corner-glow bottom-right"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-switcher" style="top: 30px;">
+    <label class="switcher__option" onclick="window.location.href='/#games'">
+      <input class="switcher__input" type="radio" name="nav-theme" value="back" />
+      <span class="switcher__text">Back</span>
+    </label>
+    <label class="switcher__option" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <input class="switcher__input" type="radio" name="nav-theme" value="overview" checked />
+      <span class="switcher__text">Overview</span>
+    </label>
+  </nav>
+
+  <div id="project-container"></div>
+
+  <script src="/src/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => renderProjectPage('ganja-mafia'));
+  </script>
+</body>
+</html>

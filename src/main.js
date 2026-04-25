@@ -1283,11 +1283,21 @@ document.addEventListener('DOMContentLoaded', () => {
         landingOverlay.remove();
       }, 800);
     });
+  } else {
+    // If not on landing page, init audio directly so click listeners bind
+    if (typeof AudioManager !== 'undefined') AudioManager.init();
   }
 });
 
 // --- SETTINGS PANEL LOGIC --- //
 document.addEventListener('DOMContentLoaded', () => {
+  const landingOverlay = document.getElementById('landing-overlay');
+  
+  if (!landingOverlay && typeof AudioManager !== 'undefined') {
+    // If we're on a sub-page without landing overlay, initialize audio listener
+    AudioManager.init();
+  }
+  
   const settingsTrigger = document.getElementById('settings-trigger');
   const settingsDropdown = document.querySelector('.settings-dropdown');
   const toggleMoths = document.getElementById('toggle-moths');
