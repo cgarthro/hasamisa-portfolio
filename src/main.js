@@ -319,9 +319,7 @@ function animateMoths() {
   }
   requestAnimationFrame(animateMoths);
 }
-animateMoths();
-
-// 1.5 Dynamic JSON Gallery Loader
+animateMoths();// 1.5 Dynamic JSON Gallery Loader
 async function loadDynamicGallery() {
   try {
     const response = await fetch('/data.json');
@@ -1254,12 +1252,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('start-btn');
   const cursor = document.querySelector('.custom-cursor');
 
+  // Check session storage to see if user already dismissed it this session
+  const hasVisited = sessionStorage.getItem('hasamisa_visited');
+
   if (landingOverlay) {
-    // Lock scroll while overlay is visible
-    document.body.style.overflow = 'hidden';
+    if (hasVisited === 'true') {
+      // User already clicked start previously, remove it immediately
+      landingOverlay.style.display = 'none';
+      setTimeout(() => landingOverlay.remove(), 10);
+      document.body.style.overflow = '';
+      if (typeof AudioManager !== 'undefined') AudioManager.init();
+    } else {
+      // Lock scroll while overlay is visible
+      document.body.style.overflow = 'hidden';
+    }
   }
 
-  if (startBtn && landingOverlay) {
+  if (startBtn && landingOverlay && hasVisited !== 'true') {
     // Show rotating lens cursor on hover over the start button
     startBtn.addEventListener('mouseenter', () => {
       if (cursor) cursor.classList.add('hover');
@@ -1277,13 +1286,16 @@ document.addEventListener('DOMContentLoaded', () => {
         AudioManager.init();
       }
       
+      // Save state so it doesn't reappear
+      sessionStorage.setItem('hasamisa_visited', 'true');
+      
       // Fade out and remove overlay
       landingOverlay.classList.add('fade-out');
       setTimeout(() => {
         landingOverlay.remove();
       }, 800);
     });
-  } else {
+  } else if (!landingOverlay) {
     // If not on landing page, init audio directly so click listeners bind
     if (typeof AudioManager !== 'undefined') AudioManager.init();
   }
@@ -1392,3 +1404,125 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// --- PROJECT PAGE RENDERER --- //
+window.renderProjectPage = async (projectId) => {
+  try {
+    let response;
+    try {
+      response = await fetch('/data.json');
+      if (!response.ok) throw new Error('Not found at root');
+    } catch(e) {
+      // Fallback for live-server/static hosting where public isn't mapped to root
+      response = await fetch('/public/data.json'); 
+    }
+    const data = await response.json();
+    const project = data.projects && data.projects[projectId];
+    if (!project) return;
+    
+    const container = document.getElementById('project-container');
+    if (!container) return;
+    
+    const title3 = project.titlePath3 ? project.titlePath3 : '';
+    
+    // Header
+    const titleHTML = `
+      <header class="project-header">
+        <img src="${project.heroBg}" alt="Hero" class="project-header-bg">
+        <div class="project-title-area">
+          <h1 class="chromatic-text" data-text="${project.titlePath1}${project.titlePath2}${title3}">${project.titlePath1}<span class="cyan-text">${project.titlePath2}</span>${title3}</h1>
+          <div class="project-meta">
+            ${project.meta.map(m => `<span>${m}</span>`).join('')}
+          </div>
+        </div>
+      </header>
+    `;
+
+    // Overview
+    const overviewHTML = `
+      <section class="story-section visible">
+        <div class="story-grid">
+          <div class="story-text">
+            <h2>${project.visionTitle}</h2>
+            <p>${project.visionText}</p>
+            <div class="tech-specs">
+              ${project.specs.map(s => `
+                <div class="spec-item">
+                  <span class="spec-val">${s.val}</span>
+                  <span class="spec-label">${s.label}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <img src="${project.visionImage}" alt="Vision" class="story-image">
+        </div>
+      </section>
+    `;
+
+    // Deep Dive
+    const deepDiveHTML = `
+      <section class="story-section visible">
+        <h2>${project.deepDiveTitle}</h2>
+        <div class="story-grid">
+          <img src="${project.deepDiveImage}" alt="Deep Dive" class="story-image">
+          <div class="story-text">
+            <p>${project.deepDiveText}</p>
+          </div>
+        </div>
+      </section>
+    `;
+
+    // Gallery
+    const galleryHTML = `
+      <section class="story-section visible">
+        <h2>Asset Gallery</h2>
+        <p class="story-text">${project.galleryText}</p>
+        <div class="asset-grid">
+          ${project.assets.map(a => `
+            <div class="asset-card project-showcase gallery-card" data-hd="${a.hd}">
+              <div class="media-container">
+                <img src="${a.thumb}" alt="Asset">
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    `;
+
+    // CTA
+    const ctaHTML = `
+      <section class="story-section cta-container visible">
+        <h2>Experience the Game</h2>
+        <p class="story-text" style="margin-bottom: 30px;">Play the game now on Itch.io.</p>
+        <a href="${project.itchLink}" target="_blank" style="text-decoration:none;">
+          <button class="liquid-button">
+            <span>Play on Itch.io</span>
+            <div class="liquid"></div>
+          </button>
+        </a>
+      </section>
+    `;
+
+    container.innerHTML = titleHTML + `<main class="project-content">` + overviewHTML + deepDiveHTML + galleryHTML + ctaHTML + `</main>`;
+    
+    // Remove is-loading so the background is visible right away without loader delay
+    document.body.classList.remove('is-loading');
+
+    // Bind lightbox logic for any hd assets
+    if (window.bindLightbox) {
+      setTimeout(() => window.bindLightbox(), 100);
+    }
+
+    // Scroll reveal observer (Optional: Removed initial hidden CSS above to ensure visibility)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    container.querySelectorAll('.story-section').forEach(s => observer.observe(s));
+    
+  } catch (err) {
+    console.error('Error loading project HTML:', err);
+  }
+};
