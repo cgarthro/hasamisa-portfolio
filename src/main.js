@@ -69,23 +69,30 @@ const createCursor = () => {
     cursor.style.top = `${e.clientY}px`;
   });
 
-  const hoverElements = document.querySelectorAll('a, button, .skill-card, .project-showcase, input, .settings-wrapper, .settings-dropdown');
-  hoverElements.forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.classList.add('hover');
-      if (typeof AudioManager !== 'undefined') {
-        AudioManager.stop('lantern');
-        AudioManager.play('hover');
-      }
+  window.bindCursorHover = (scope = document) => {
+    const hoverElements = scope.querySelectorAll('a, button, .skill-card, .project-showcase, input, .settings-wrapper, .settings-dropdown, .asset-card, .story-image-card');
+    hoverElements.forEach(el => {
+      if (el.dataset.cursorBound) return;
+      el.dataset.cursorBound = 'true';
+      el.addEventListener('mouseenter', () => {
+        const customCursor = document.querySelector('.custom-cursor');
+        if (customCursor) customCursor.classList.add('hover');
+        if (typeof AudioManager !== 'undefined') {
+          AudioManager.stop('lantern');
+          AudioManager.play('hover');
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        const customCursor = document.querySelector('.custom-cursor');
+        if (customCursor) customCursor.classList.remove('hover');
+        if (typeof AudioManager !== 'undefined') {
+          AudioManager.stop('hover');
+          AudioManager.play('lantern');
+        }
+      });
     });
-    el.addEventListener('mouseleave', () => {
-      cursor.classList.remove('hover');
-      if (typeof AudioManager !== 'undefined') {
-        AudioManager.stop('hover');
-        AudioManager.play('lantern');
-      }
-    });
-  });
+  };
+  window.bindCursorHover();
 
   // Slider handle: show native ew-resize arrow, hide ALL custom cursors
   const sliderHandles = document.querySelectorAll('.slider-handle');
@@ -453,24 +460,7 @@ async function loadDynamicGallery() {
     }
 
     // Re-bind hover cursors for all the new dynamic cards
-    const hoverElements = document.querySelectorAll('.dynamic-card');
-    const cursor = document.querySelector('.custom-cursor');
-    hoverElements.forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        if (cursor) cursor.classList.add('hover');
-        if (typeof AudioManager !== 'undefined') {
-          AudioManager.stop('lantern');
-          AudioManager.play('hover');
-        }
-      });
-      el.addEventListener('mouseleave', () => {
-        if (cursor) cursor.classList.remove('hover');
-        if (typeof AudioManager !== 'undefined') {
-          AudioManager.stop('hover');
-          AudioManager.play('lantern');
-        }
-      });
-    });
+    if (window.bindCursorHover) window.bindCursorHover();
 
     // Re-bind slider handles for new dynamic cards (sliding class hides custom cursor)
     const newHandles = document.querySelectorAll('.slider-handle');
@@ -1491,7 +1481,7 @@ window.renderProjectPage = async (projectId) => {
               `).join('')}
             </div>
           </div>
-          <img src="${project.visionImage}" alt="Vision" class="story-image">
+          <div class="asset-card story-image-card" data-hd="${project.visionImage}"><div class="media-container" style="border:none;background:none;box-shadow:none;"><img src="${project.visionImage}" alt="Vision" class="story-image"></div></div>
         </div>
       </section>
     `;
@@ -1501,7 +1491,7 @@ window.renderProjectPage = async (projectId) => {
       <section class="story-section visible">
         <h2>${project.deepDiveTitle}</h2>
         <div class="story-grid">
-          <img src="${project.deepDiveImage}" alt="Deep Dive" class="story-image">
+          <div class="asset-card story-image-card" data-hd="${project.deepDiveImage}"><div class="media-container" style="border:none;background:none;box-shadow:none;"><img src="${project.deepDiveImage}" alt="Deep Dive" class="story-image"></div></div>
           <div class="story-text">
             <p>${project.deepDiveText}</p>
           </div>
@@ -1516,7 +1506,7 @@ window.renderProjectPage = async (projectId) => {
         <p class="story-text">${project.galleryText}</p>
         <div class="asset-grid">
           ${project.assets.map(a => `
-            <div class="asset-card gallery-card" style="--card-ratio: ${a.aspectRatio || 'auto'}" data-hd-ratio="${a.aspectRatio || 'auto'}">
+            <div class="asset-card gallery-card" style="--card-ratio: 1/1" data-hd-ratio="${a.aspectRatio || 'auto'}" >
               <div class="media-container" data-hd="${a.hd}">
                 <img src="${a.thumb}" alt="Asset">
               </div>
@@ -1548,6 +1538,11 @@ window.renderProjectPage = async (projectId) => {
     // Bind lightbox logic for any hd assets
     if (window.bindLightbox) {
       setTimeout(() => window.bindLightbox(), 100);
+    }
+    
+    // Bind cursor hovers for newly injected elements
+    if (window.bindCursorHover) {
+      setTimeout(() => window.bindCursorHover(), 100);
     }
 
     // Scroll reveal observer (Optional: Removed initial hidden CSS above to ensure visibility)
