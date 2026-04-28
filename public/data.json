@@ -1,4 +1,48 @@
 {
+  "games": [
+    {
+      "id": "proto",
+      "title": "Proto : Last Hope",
+      "desc": "Playable game utilizing advanced Unreal Engine mechanics and custom assets.",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
+      "animation": "float",
+      "link": "/projects/proto.html"
+    },
+    {
+      "id": "grandpa",
+      "title": "Putting Grandpa Back Together",
+      "desc": "Top 10 India GameJam 2024 Entry.",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "animation": "pulse",
+      "link": "/projects/grandpa.html"
+    },
+    {
+      "id": "ganja-mafia",
+      "title": "Ganja Mafia",
+      "desc": "Action-packed mafia exploration crafted with passion and unique mechanics.",
+      "image": "https://cgarthro.carrd.co/assets/images/gallery01/82299fdb.jpg",
+      "animation": "float",
+      "link": "/projects/ganja-mafia.html"
+    }
+  ],
+  "skills": [
+    {
+      "title": "Hard Surface",
+      "desc": "Creating intricate machinery, vehicles, and high-fidelity game assets optimized for real-time engines."
+    },
+    {
+      "title": "Look Development",
+      "desc": "Advanced PBR texturing, procedural shading, and lighting logic to achieve striking photorealism."
+    },
+    {
+      "title": "Environment Art",
+      "desc": "Building massive, immersive environments focusing on mood, storytelling, and lighting composition."
+    },
+    {
+      "title": "Technical Art",
+      "desc": "Bridging art and logic with Unreal Engine integrations, cloth sims, and performance optimization."
+    }
+  ],
   "stills": [
     {
       "title": "Halloween Witch Bunny",
@@ -100,41 +144,61 @@
       "titlePath1": "Proto: ",
       "titlePath2": "Last Hope",
       "meta": [
-        "Game Development",
-        "Unreal Engine 5",
-        "Action / Stealth"
+        "Unity",
+        "Game Assets, Environment & Shaders",
+        "Puzzle/Platformer/Adventure"
       ],
-      "heroBg": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
+      "heroBg": "/images/proto.jpg",
       "visionTitle": "The Vision",
-      "visionText": "Proto: Last Hope is a passion project built on advanced Unreal Engine mechanics. Drawing on high-end 3D environments and rigorous optimization, the game bridges intense gameplay with breathtaking atmospheric rendering. The objective was to create a playable slice that demonstrates both technical art and engaging level design.",
+      "visionText": "Built in just 48 hours for the WTF x IGDC Game Jam, Proto: Last Hope is a fast-paced puzzle-adventure about a small robot racing through a high-tech lab to synthesize a cure. Working in a team of five, we stripped the scope to what mattered most: clear mechanics, strong visual feedback, and tight collaboration. Despite the extreme deadline, our focused communication and rapid iteration earned us a Top 10 placement. This project shows I can align with a team, make decisive creative calls under pressure, and ship a polished, emotionally engaging experience on a tight timeline.",
       "specs": [
         {
           "label": "Engine",
-          "val": "Unreal 5"
+          "val": "Unity"
         },
         {
-          "label": "Lighting",
-          "val": "Lumen"
+          "label": "Custom Bordered Toon Shader with Godrays in URP",
+          "val": "Lighting"
         }
       ],
-      "visionImage": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
-      "deepDiveTitle": "Technical Deep Dive",
-      "deepDiveText": "The core rendering utilizes Lumen for dynamic global illumination, allowing for moody, realistic stealth environments. High-fidelity custom particle systems were engineered to provide visceral feedback without sacrificing real-time performance on mid-tier hardware.",
-      "deepDiveImage": "https://via.placeholder.com/800x450/111111/0CAEB9?text=Engine+Setup+Shot",
+      "visionImage": "/images/proto1.jpg",
+      "deepDiveTitle": "Technical & Art Deep Dive",
+      "deepDiveText": "As the sole 3D artist and shader developer, I handled all game art from modeling to final render within the 48-hour jam. I built, UV’d, and textured every asset, then wrote custom shaders to drive the visual identity: a bordered toon shader for stylized characters, a dynamic liquid shader for the chemical mixing mechanic, a refractive glass shader for lab containers, and volumetric god rays for atmospheric lighting. By designing modular prefabs, baking key lighting, and keeping shaders lightweight, I maintained stable performance while delivering a cohesive, stylized look. Shipping all game art and custom shader work under jam conditions proves I can rapidly prototype, iterate, and deliver production-quality visuals without sacrificing performance or polish.",
+      "deepDiveImage": "/images/proto2.png",
       "galleryText": "A collection of original models, animations, and environment props designed specifically for the Proto experience. Click to expand.",
       "assets": [
         {
-          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+1",
-          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+1"
+          "thumb": "/images/proto/1.jpg",
+          "hd": "/images/proto/1.jpg"
         },
         {
-          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+2",
-          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+2"
+          "thumb": "/images/proto/2.jpg",
+          "hd": "/images/proto/2.jpg"
         },
         {
-          "thumb": "https://via.placeholder.com/600x600/111111/0CAEB9?text=Asset+3",
-          "hd": "https://via.placeholder.com/1920x1080/111111/0CAEB9?text=High+Res+Asset+3"
-        }
+          "thumb": "/images/proto/8.jpg",
+          "hd": "/images/proto/8.jpg"
+        },
+        {
+          "thumb": "/images/proto/5.jpg",
+          "hd": "/images/proto/5.jpg"
+        },
+        {
+          "thumb": "/images/proto/6.jpg",
+          "hd": "/images/proto/6.jpg"
+        },
+        {
+          "thumb": "/images/proto/4.jpg",
+          "hd": "/images/proto/4.jpg"
+        },
+        {
+          "thumb": "/images/proto/3.jpg",
+          "hd": "/images/proto/3.jpg"
+        },
+        {
+          "thumb": "/images/proto/7.jpg",
+          "hd": "/images/proto/7.jpg"
+        },
       ],
       "itchLink": "https://cgarthr0.itch.io/proto-lasthope"
     },

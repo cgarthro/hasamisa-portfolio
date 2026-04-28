@@ -350,6 +350,7 @@ async function loadDynamicGallery() {
     };
 
     Object.keys(categories).forEach(categoryKey => {
+      if (categoryKey === 'games' || categoryKey === 'skills') return;
       const track = document.getElementById(`${categoryKey}-track`);
       if (!track) return;
       track.innerHTML = ''; // Ensure cleanly empty
@@ -413,6 +414,43 @@ async function loadDynamicGallery() {
         track.appendChild(card);
       });
     });
+
+    // Render Games
+    if (categories.games) {
+      const gamesGrid = document.getElementById('games-grid');
+      if (gamesGrid) {
+        gamesGrid.innerHTML = '';
+        categories.games.forEach(game => {
+          gamesGrid.innerHTML += `
+            <a href="${game.link}" style="text-decoration:none;">
+              <div class="skill-card glass-card tilt-effect dynamic-card">
+                <div class="media-container" style="margin-bottom: 1.5rem;">
+                  ${renderMedia(game.image, `ambient-img ${game.animation || ''}`, game.title)}
+                </div>
+                <h3>${game.title}</h3>
+                <p>${game.desc}</p>
+              </div>
+            </a>
+          `;
+        });
+      }
+    }
+
+    // Render Skills
+    if (categories.skills) {
+      const skillsGrid = document.getElementById('skills-grid');
+      if (skillsGrid) {
+        skillsGrid.innerHTML = '';
+        categories.skills.forEach(skill => {
+          skillsGrid.innerHTML += `
+            <div class="skill-card glass-card tilt-effect dynamic-card">
+              <h3>${skill.title}</h3>
+              <p>${skill.desc}</p>
+            </div>
+          `;
+        });
+      }
+    }
 
     // Re-bind hover cursors for all the new dynamic cards
     const hoverElements = document.querySelectorAll('.dynamic-card');
@@ -740,7 +778,7 @@ function initLightbox() {
   closeBtn.addEventListener('click', closeLightbox);
 
   window.bindLightbox = (scope = document) => {
-    const cards = scope.querySelectorAll('.project-showcase:not(.lightbox-bound)');
+    const cards = scope.querySelectorAll('.project-showcase:not(.lightbox-bound), .asset-card:not(.lightbox-bound)');
     cards.forEach(card => {
       card.classList.add('lightbox-bound');
 
@@ -1478,8 +1516,8 @@ window.renderProjectPage = async (projectId) => {
         <p class="story-text">${project.galleryText}</p>
         <div class="asset-grid">
           ${project.assets.map(a => `
-            <div class="asset-card project-showcase gallery-card" data-hd="${a.hd}">
-              <div class="media-container">
+            <div class="asset-card gallery-card" style="--card-ratio: ${a.aspectRatio || 'auto'}" data-hd-ratio="${a.aspectRatio || 'auto'}">
+              <div class="media-container" data-hd="${a.hd}">
                 <img src="${a.thumb}" alt="Asset">
               </div>
             </div>
