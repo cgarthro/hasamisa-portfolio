@@ -165,7 +165,7 @@
       "deepDiveTitle": "Technical & Art Deep Dive",
       "deepDiveText": "As the sole 3D artist and shader developer, I handled all game art from modeling to final render within the 48-hour jam. I built, UV’d, and textured every asset, then wrote custom shaders to drive the visual identity: a bordered toon shader for stylized characters, a dynamic liquid shader for the chemical mixing mechanic, a refractive glass shader for lab containers, and volumetric god rays for atmospheric lighting. By designing modular prefabs, baking key lighting, and keeping shaders lightweight, I maintained stable performance while delivering a cohesive, stylized look. Shipping all game art and custom shader work under jam conditions proves I can rapidly prototype, iterate, and deliver production-quality visuals without sacrificing performance or polish.",
       "deepDiveImage": "/images/proto2.png",
-      "galleryText": "A collection of original models, animations, and environment props designed specifically for the Proto experience. Click to expand.",
+      "galleryText": "A collection of original assets, modelled and textured specifically for the Proto game within that 48 hour time limit. Click to expand.",
       "assets": [
         {
           "thumb": "/images/proto/1.jpg",
@@ -198,6 +198,34 @@
         {
           "thumb": "/images/proto/7.jpg",
           "hd": "/images/proto/7.jpg"
+        },
+        {
+          "thumb": "/images/proto/9.jpg",
+          "hd": "/images/proto/9.jpg"
+        },
+        {
+          "thumb": "/images/proto/10.jpg",
+          "hd": "/images/proto/10.jpg"
+        },
+        {
+          "thumb": "/images/proto/11.jpg",
+          "hd": "/images/proto/11.jpg"
+        },
+        {
+          "thumb": "/images/proto/12.jpg",
+          "hd": "/images/proto/12.jpg"
+        },
+        {
+          "thumb": "/images/proto/13.jpg",
+          "hd": "/images/proto/13.jpg"
+        },
+        {
+          "thumb": "/images/proto/14.jpg",
+          "hd": "/images/proto/14.jpg"
+        },
+        {
+          "thumb": "/images/proto/15.jpg",
+          "hd": "/images/proto/15.jpg"
         }
       ],
       "itchLink": "https://cgarthr0.itch.io/proto-lasthope"

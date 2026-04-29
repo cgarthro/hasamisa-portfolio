@@ -43,7 +43,12 @@ body {
 body,
 a,
 button,
-input {
+input,
+.asset-card,
+.story-image-card,
+.skill-card,
+.project-showcase,
+.liquid-button {
   cursor: none !important;
 }
 
@@ -52,12 +57,17 @@ input {
   position: fixed;
   top: 0;
   left: 0;
+  width: 0;
+  height: 0;
   pointer-events: none;
   z-index: 999999;
-  transform: translate(-50%, -50%);
 }
 
 .cursor-lantern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
   transition: opacity 0.3s;
   opacity: 1;
   filter: drop-shadow(0 0 8px rgba(17, 164, 212, 0.8)) drop-shadow(0 0 20px rgba(17, 164, 212, 0.4));
@@ -65,14 +75,12 @@ input {
 
 .cursor-lens {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 0;
+  left: 0;
   width: 60px;
   height: 60px;
   border-radius: 35%;
-  /* Squircle — everything is one unified shape */
-
-  /* Glass Distortion — NO blur, pure refraction */
+  /* Glass Distortion — noise/lens refraction */
   backdrop-filter: url(#glass-distortion);
   -webkit-backdrop-filter: url(#glass-distortion);
 
@@ -84,8 +92,8 @@ input {
 
   opacity: 0;
   transition: opacity 0.25s ease;
+  transform: translate(-50%, -50%);
   animation: cursor-spin 4s linear infinite;
-  /* Everything rotates together */
 }
 
 /* On hover: hide lantern, show rotating lens */
