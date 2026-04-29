@@ -1180,48 +1180,95 @@ const AudioManager = {
   nextAmbient2Track: 'ambient2A',
 
   init() {
-    // Note: Update these paths to your actual public/audio/ files
+    // Apply saved volumes from sessionStorage (persisted settings)
+    const savedAmbientVol = parseFloat(sessionStorage.getItem('hasamisa_ambientVol') ?? '1');
+    const savedSfxVol = parseFloat(sessionStorage.getItem('hasamisa_sfxVol') ?? '1');
+    const baseVolumes = { ambient1: 0.5, ambient2A: 0.3, ambient2B: 0.3, lantern: 0.5, hover: 0.4, click: 0.8, glitch: 0.6 };
+
     this.sounds.ambient1 = new Audio('/audio/ambient1.mp3');
     this.sounds.ambient1.loop = false;
-    this.sounds.ambient1.volume = 0.5;
+    this.sounds.ambient1.volume = baseVolumes.ambient1 * savedAmbientVol;
 
-    // We use two tracks so they can overlap and play simultaneously
     this.sounds.ambient2A = new Audio('/audio/ambient2.mp3');
     this.sounds.ambient2A.loop = false;
-    this.sounds.ambient2A.volume = 0.3;
+    this.sounds.ambient2A.volume = baseVolumes.ambient2A * savedAmbientVol;
 
     this.sounds.ambient2B = new Audio('/audio/ambient2.mp3');
     this.sounds.ambient2B.loop = false;
-    this.sounds.ambient2B.volume = 0.3;
+    this.sounds.ambient2B.volume = baseVolumes.ambient2B * savedAmbientVol;
 
     this.sounds.lantern = new Audio('/audio/lantern-burn.mp3');
     this.sounds.lantern.loop = true;
-    this.sounds.lantern.volume = 0.5;
+    this.sounds.lantern.volume = baseVolumes.lantern * savedSfxVol;
 
     this.sounds.hover = new Audio('/audio/ui-hover.mp3');
     this.sounds.hover.loop = true;
-    this.sounds.hover.volume = 0.4;
+    this.sounds.hover.volume = baseVolumes.hover * savedSfxVol;
 
     this.sounds.click = new Audio('/audio/ui-click.mp3');
-    this.sounds.click.volume = 0.8;
+    this.sounds.click.volume = baseVolumes.click * savedSfxVol;
 
     this.sounds.glitch = new Audio('/audio/glitch.mp3');
-    this.sounds.glitch.volume = 0.6;
+    this.sounds.glitch.volume = baseVolumes.glitch * savedSfxVol;
 
-    // Listen for the first user interaction to unlock audio engine safely
+    // Restore ambient playback position from sessionStorage (cross-page continuity)
+    const savedAmbient1Time = parseFloat(sessionStorage.getItem('hasamisa_ambient1Time') || '0');
+    const savedAmbient2Active = sessionStorage.getItem('hasamisa_ambient2Active') === 'true';
+    const savedAmbient2Time = parseFloat(sessionStorage.getItem('hasamisa_ambient2Time') || '0');
+    const savedHasInteracted = sessionStorage.getItem('hasamisa_audioStarted') === 'true';
+
+    // Save position before unloading so blog->main or main->blog is seamless
+    window.addEventListener('beforeunload', () => {
+      if (this.hasInteracted) {
+        if (this.sounds.ambient1) sessionStorage.setItem('hasamisa_ambient1Time', this.sounds.ambient1.currentTime);
+        const a2 = this.sounds.ambient2A?.paused === false ? this.sounds.ambient2A : this.sounds.ambient2B;
+        sessionStorage.setItem('hasamisa_ambient2Active', (!a2?.paused).toString());
+        if (a2) sessionStorage.setItem('hasamisa_ambient2Time', a2.currentTime);
+        sessionStorage.setItem('hasamisa_audioStarted', 'true');
+      }
+    });
+
+    // If user already interacted in this session, resume audio immediately
+    if (savedHasInteracted && sessionStorage.getItem('hasamisa_visited') === 'true') {
+      this.hasInteracted = true;
+      this.isMuted = false;
+      if (savedAmbient1Time > 0 && !this.sounds.ambient1.ended) {
+        this.sounds.ambient1.currentTime = Math.min(savedAmbient1Time, this.ambientSettings.transitionDelaySeconds - 0.5);
+        this.play('ambient1');
+        // Schedule ambient2 for remaining time
+        const remaining = this.ambientSettings.transitionDelaySeconds - savedAmbient1Time;
+        if (remaining > 0) {
+          setTimeout(() => this.playOverlappingAmbient2(), remaining * 1000);
+        } else {
+          this.playOverlappingAmbient2();
+        }
+      } else {
+        // ambient1 already finished, resume ambient2
+        if (savedAmbient2Active) {
+          const track = this.sounds.ambient2A;
+          track.currentTime = savedAmbient2Time;
+          this.play('ambient2A');
+          const remaining = this.ambientSettings.ambient2OverlapDelay - savedAmbient2Time;
+          setTimeout(() => this.playOverlappingAmbient2(), Math.max(0, remaining) * 1000);
+        } else {
+          this.playOverlappingAmbient2();
+        }
+      }
+      this.play('lantern');
+      return; // Don't add the 'once' click listener again
+    }
+
+    // First-ever interaction in this session
     window.addEventListener('click', () => {
-      // Don't auto-start music if click is opening a lightbox
       if (this.lightboxOpen) return;
       if (!this.hasInteracted) {
         this.hasInteracted = true;
         this.isMuted = false;
+        sessionStorage.setItem('hasamisa_audioStarted', 'true');
         this.play('ambient1');
-
-        // Adjustable seconds before the looping ambient2 starts
         setTimeout(() => {
           this.playOverlappingAmbient2();
         }, this.ambientSettings.transitionDelaySeconds * 1000);
-
         this.play('lantern');
       }
     }, { once: true });
@@ -1334,7 +1381,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const landingOverlay = document.getElementById('landing-overlay');
   
   if (!landingOverlay && typeof AudioManager !== 'undefined') {
-    // If we're on a sub-page without landing overlay, initialize audio listener
     AudioManager.init();
   }
   
@@ -1346,35 +1392,69 @@ document.addEventListener('DOMContentLoaded', () => {
   const ambientVolSlider = document.getElementById('ambient-vol');
   const sfxVolSlider = document.getElementById('sfx-vol');
 
+  // --- Restore persisted settings (only if visited state is active) ---
+  const hasVisited = sessionStorage.getItem('hasamisa_visited') === 'true';
+  if (hasVisited) {
+    const savedAmbientVol = sessionStorage.getItem('hasamisa_ambientVol');
+    const savedSfxVol = sessionStorage.getItem('hasamisa_sfxVol');
+    const savedPerf = sessionStorage.getItem('hasamisa_perf');
+    const savedCursor = sessionStorage.getItem('hasamisa_cursor');
+    const savedMoths = sessionStorage.getItem('hasamisa_moths');
+
+    if (ambientVolSlider && savedAmbientVol !== null) ambientVolSlider.value = savedAmbientVol;
+    if (sfxVolSlider && savedSfxVol !== null) sfxVolSlider.value = savedSfxVol;
+    if (togglePerf && savedPerf !== null) {
+      togglePerf.checked = savedPerf === 'true';
+      if (savedPerf === 'true') document.body.classList.add('perf-mode');
+    }
+    if (toggleCursors && savedCursor !== null) toggleCursors.checked = savedCursor === 'true';
+    if (toggleMoths && savedMoths !== null) {
+      toggleMoths.checked = savedMoths === 'true';
+      window.PARTICLES_ENABLED = savedMoths === 'true';
+    }
+  }
+
   if (settingsTrigger) {
-    // Toggle Dropdown
     settingsTrigger.addEventListener('click', (e) => {
       e.stopPropagation();
       settingsDropdown.classList.toggle('active');
     });
     
-    // Close when clicking outside
     document.addEventListener('click', (e) => {
       if (!settingsDropdown.contains(e.target) && !settingsTrigger.contains(e.target)) {
         settingsDropdown.classList.remove('active');
       }
     });
 
-    // Moth Particles Logic
     if (toggleMoths) {
       toggleMoths.addEventListener('change', (e) => {
         window.PARTICLES_ENABLED = e.target.checked;
+        sessionStorage.setItem('hasamisa_moths', e.target.checked);
       });
     }
 
-    // Custom Cursor Logic
     const styleBlock = document.createElement('style');
     styleBlock.innerHTML = '* { cursor: none !important; }';
     document.head.appendChild(styleBlock);
+
+    // Apply saved cursor setting immediately
+    if (hasVisited) {
+      const savedCursor = sessionStorage.getItem('hasamisa_cursor');
+      if (savedCursor === 'false') {
+        const customCursor = document.querySelector('.custom-cursor');
+        if (customCursor) customCursor.style.display = 'none';
+        styleBlock.innerHTML = `
+          * { cursor: auto !important; }
+          a, a *, button, button *, input:not([type="range"]), .settings-wrapper, .settings-wrapper *, .lightbox-close, .skill-card, .menu, .dock img, .switcher__option, .switcher__text, .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch, .toggle-slider, .project-showcase { cursor: pointer !important; }
+          input[type="range"], .slider-handle { cursor: ew-resize !important; }
+        `;
+      }
+    }
     
     if (toggleCursors) {
       toggleCursors.addEventListener('change', (e) => {
         const customCursor = document.querySelector('.custom-cursor');
+        sessionStorage.setItem('hasamisa_cursor', e.target.checked);
         if (e.target.checked) {
           if (customCursor) customCursor.style.display = 'block';
           styleBlock.innerHTML = '* { cursor: none !important; }';
@@ -1389,7 +1469,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     
-    // Audio Sliders Logic
     if (typeof AudioManager !== 'undefined') {
       const baseVolumes = {
         ambient1: 0.5, ambient2A: 0.3, ambient2B: 0.3,
@@ -1398,35 +1477,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (ambientVolSlider) {
         ambientVolSlider.addEventListener('input', (e) => {
-           const masterVol = parseFloat(e.target.value); 
-           ['ambient1', 'ambient2A', 'ambient2B'].forEach(key => {
-             if (AudioManager.sounds[key]) {
-               AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
-             }
-           });
+          const masterVol = parseFloat(e.target.value);
+          sessionStorage.setItem('hasamisa_ambientVol', masterVol);
+          ['ambient1', 'ambient2A', 'ambient2B'].forEach(key => {
+            if (AudioManager.sounds[key]) AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
+          });
         });
       }
 
       if (sfxVolSlider) {
         sfxVolSlider.addEventListener('input', (e) => {
-           const masterVol = parseFloat(e.target.value); 
-           ['lantern', 'hover', 'click', 'glitch'].forEach(key => {
-             if (AudioManager.sounds[key]) {
-               AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
-             }
-           });
+          const masterVol = parseFloat(e.target.value);
+          sessionStorage.setItem('hasamisa_sfxVol', masterVol);
+          ['lantern', 'hover', 'click', 'glitch'].forEach(key => {
+            if (AudioManager.sounds[key]) AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
+          });
         });
       }
     }
 
-    // Performance Mode Logic
     if (togglePerf) {
       togglePerf.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          document.body.classList.add('perf-mode');
-        } else {
-          document.body.classList.remove('perf-mode');
-        }
+        sessionStorage.setItem('hasamisa_perf', e.target.checked);
+        if (e.target.checked) document.body.classList.add('perf-mode');
+        else document.body.classList.remove('perf-mode');
       });
     }
   }
