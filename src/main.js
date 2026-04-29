@@ -1507,7 +1507,7 @@ window.renderProjectPage = async (projectId) => {
         <div class="asset-grid">
           ${project.assets.map(a => `
             <div class="asset-card gallery-card" style="--card-ratio: 1/1" data-hd-ratio="${a.aspectRatio || 'auto'}" >
-              <div class="media-container" data-hd="${a.hd}">
+              <div class="media-container" style="aspect-ratio: 1/1;" data-hd="${a.hd}">
                 <img src="${a.thumb}" alt="Asset">
               </div>
             </div>
@@ -1530,7 +1530,7 @@ window.renderProjectPage = async (projectId) => {
       </section>
     `;
 
-    container.innerHTML = titleHTML + `<main class="project-content">` + overviewHTML + deepDiveHTML + galleryHTML + ctaHTML + `</main>`;
+    container.innerHTML = titleHTML + `<main class="project-content">` + ctaHTML + overviewHTML + deepDiveHTML + galleryHTML + `</main>`;
     
     // Remove is-loading so the background is visible right away without loader delay
     document.body.classList.remove('is-loading');
