@@ -40,15 +40,7 @@ body {
   -webkit-touch-callout: none;
 }
 
-body,
-a,
-button,
-input,
-.asset-card,
-.story-image-card,
-.skill-card,
-.project-showcase,
-.liquid-button {
+* {
   cursor: none !important;
 }
 

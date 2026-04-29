@@ -6,22 +6,20 @@
 (function applyPersistedSettings() {
   if (sessionStorage.getItem('hasamisa_visited') !== 'true') return;
 
-  // 1. Perf mode — add class to body immediately (avoids flash)
+  // 1. Perf mode
   if (sessionStorage.getItem('hasamisa_perf') === 'true') {
     document.documentElement.classList.add('perf-mode');
-    // Move to body once it exists
     document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('perf-mode');
       document.documentElement.classList.remove('perf-mode');
     });
   }
 
-  // 2. Custom cursor — inject style tag immediately to hide native cursor
-  //    or to restore it if the user turned off the custom cursor
-  const cursorOff = sessionStorage.getItem('hasamisa_cursor') === 'false';
-  const styleEl = document.createElement('style');
-  styleEl.id = 'universal-cursor-style';
-  if (cursorOff) {
+  // 2. Custom cursor — CSS already hides it globally via * { cursor: none }.
+  //    Only restore native cursor if user turned custom cursor OFF.
+  if (sessionStorage.getItem('hasamisa_cursor') === 'false') {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'universal-cursor-style';
     styleEl.innerHTML = `
       * { cursor: auto !important; }
       a, a *, button, button *, input:not([type="range"]),
@@ -31,20 +29,15 @@
       .toggle-slider, .project-showcase, .asset-card { cursor: pointer !important; }
       input[type="range"], .slider-handle { cursor: ew-resize !important; }
     `;
-  } else {
-    styleEl.innerHTML = '* { cursor: none !important; }';
-  }
-  document.head.appendChild(styleEl);
+    document.head.appendChild(styleEl);
 
-  // 3. Custom cursor element — hide it if turned off
-  if (cursorOff) {
     document.addEventListener('DOMContentLoaded', () => {
       const customCursor = document.querySelector('.custom-cursor');
       if (customCursor) customCursor.style.display = 'none';
     });
   }
 
-  // 4. Moths — set global flag so particle loop checks it
+  // 3. Moths
   if (sessionStorage.getItem('hasamisa_moths') === 'false') {
     window.PARTICLES_ENABLED = false;
   }
@@ -1485,41 +1478,32 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Reuse the style tag injected by the universal settings applier (don't create a duplicate)
-    const styleBlock = document.getElementById('universal-cursor-style') || (() => {
-      const s = document.createElement('style');
-      s.id = 'universal-cursor-style';
-      s.innerHTML = '* { cursor: none !important; }';
-      document.head.appendChild(s);
-      return s;
-    })();
-
-    // Apply saved cursor setting immediately
-    if (hasVisited) {
-      const savedCursor = sessionStorage.getItem('hasamisa_cursor');
-      if (savedCursor === 'false') {
-        const customCursor = document.querySelector('.custom-cursor');
-        if (customCursor) customCursor.style.display = 'none';
-        styleBlock.innerHTML = `
-          * { cursor: auto !important; }
-          a, a *, button, button *, input:not([type="range"]), .settings-wrapper, .settings-wrapper *, .lightbox-close, .skill-card, .menu, .dock img, .switcher__option, .switcher__text, .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch, .toggle-slider, .project-showcase { cursor: pointer !important; }
-          input[type="range"], .slider-handle { cursor: ew-resize !important; }
-        `;
+    // Reuse the style tag from IIFE (only exists when cursor is OFF), or create one on demand
+    const getStyleBlock = () => {
+      let s = document.getElementById('universal-cursor-style');
+      if (!s) {
+        s = document.createElement('style');
+        s.id = 'universal-cursor-style';
+        document.head.appendChild(s);
       }
-    }
-    
+      return s;
+    };
+
     if (toggleCursors) {
       toggleCursors.addEventListener('change', (e) => {
         const customCursor = document.querySelector('.custom-cursor');
         sessionStorage.setItem('hasamisa_cursor', e.target.checked);
+        const styleBlock = getStyleBlock();
         if (e.target.checked) {
+          // Custom cursor ON: CSS already hides native cursor, just show custom element
           if (customCursor) customCursor.style.display = 'block';
-          styleBlock.innerHTML = '* { cursor: none !important; }';
+          styleBlock.innerHTML = ''; // Remove any native-cursor override
         } else {
+          // Custom cursor OFF: restore native cursor and hide element
           if (customCursor) customCursor.style.display = 'none';
           styleBlock.innerHTML = `
             * { cursor: auto !important; }
-            a, a *, button, button *, input:not([type="range"]), .settings-wrapper, .settings-wrapper *, .lightbox-close, .skill-card, .menu, .dock img, .switcher__option, .switcher__text, .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch, .toggle-slider, .project-showcase { cursor: pointer !important; }
+            a, a *, button, button *, input:not([type="range"]), .settings-wrapper, .settings-wrapper *, .lightbox-close, .skill-card, .menu, .dock img, .switcher__option, .switcher__text, .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch, .toggle-slider, .project-showcase, .asset-card { cursor: pointer !important; }
             input[type="range"], .slider-handle { cursor: ew-resize !important; }
           `;
         }
