@@ -1,4 +1,57 @@
+// =====================================================================
+// UNIVERSAL SETTINGS APPLIER — runs on every page, before DOM ready
+// Reads sessionStorage and applies persisted settings immediately.
+// No DOM element dependencies — works on index + all blog pages.
+// =====================================================================
+(function applyPersistedSettings() {
+  if (sessionStorage.getItem('hasamisa_visited') !== 'true') return;
+
+  // 1. Perf mode — add class to body immediately (avoids flash)
+  if (sessionStorage.getItem('hasamisa_perf') === 'true') {
+    document.documentElement.classList.add('perf-mode');
+    // Move to body once it exists
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('perf-mode');
+      document.documentElement.classList.remove('perf-mode');
+    });
+  }
+
+  // 2. Custom cursor — inject style tag immediately to hide native cursor
+  //    or to restore it if the user turned off the custom cursor
+  const cursorOff = sessionStorage.getItem('hasamisa_cursor') === 'false';
+  const styleEl = document.createElement('style');
+  styleEl.id = 'universal-cursor-style';
+  if (cursorOff) {
+    styleEl.innerHTML = `
+      * { cursor: auto !important; }
+      a, a *, button, button *, input:not([type="range"]),
+      .settings-wrapper, .settings-wrapper *, .lightbox-close,
+      .skill-card, .menu, .dock img, .switcher__option, .switcher__text,
+      .nav-switcher, .nav-switcher *, .card-icon, label, .toggle-switch,
+      .toggle-slider, .project-showcase, .asset-card { cursor: pointer !important; }
+      input[type="range"], .slider-handle { cursor: ew-resize !important; }
+    `;
+  } else {
+    styleEl.innerHTML = '* { cursor: none !important; }';
+  }
+  document.head.appendChild(styleEl);
+
+  // 3. Custom cursor element — hide it if turned off
+  if (cursorOff) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const customCursor = document.querySelector('.custom-cursor');
+      if (customCursor) customCursor.style.display = 'none';
+    });
+  }
+
+  // 4. Moths — set global flag so particle loop checks it
+  if (sessionStorage.getItem('hasamisa_moths') === 'false') {
+    window.PARTICLES_ENABLED = false;
+  }
+})();
+
 // 0. Custom Cursor — Glowing Lantern SVG + Hover Square
+
 const createCursor = () => {
   const cursor = document.createElement('div');
   cursor.classList.add('custom-cursor');
