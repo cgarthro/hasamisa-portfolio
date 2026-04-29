@@ -360,7 +360,7 @@ class Moth {
 for (let i = 0; i < NUM_AMBIENT; i++) moths.push(new Moth(false));
 for (let i = 0; i < NUM_SWARM; i++) moths.push(new Moth(true));
 
-window.PARTICLES_ENABLED = true;
+if (window.PARTICLES_ENABLED === undefined) window.PARTICLES_ENABLED = true;
 function animateMoths() {
   if (!window.PARTICLES_ENABLED) {
     ctxBack.clearRect(0, 0, width, height);
@@ -1478,7 +1478,6 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsDropdown.classList.remove('active');
       }
     });
-
     if (toggleMoths) {
       toggleMoths.addEventListener('change', (e) => {
         window.PARTICLES_ENABLED = e.target.checked;
@@ -1486,9 +1485,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const styleBlock = document.createElement('style');
-    styleBlock.innerHTML = '* { cursor: none !important; }';
-    document.head.appendChild(styleBlock);
+    // Reuse the style tag injected by the universal settings applier (don't create a duplicate)
+    const styleBlock = document.getElementById('universal-cursor-style') || (() => {
+      const s = document.createElement('style');
+      s.id = 'universal-cursor-style';
+      s.innerHTML = '* { cursor: none !important; }';
+      document.head.appendChild(s);
+      return s;
+    })();
 
     // Apply saved cursor setting immediately
     if (hasVisited) {
