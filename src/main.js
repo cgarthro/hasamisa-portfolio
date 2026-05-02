@@ -4,10 +4,8 @@
 // No DOM element dependencies — works on index + all blog pages.
 // =====================================================================
 (function applyPersistedSettings() {
-  if (sessionStorage.getItem('hasamisa_visited') !== 'true') return;
-
   // 1. Perf mode
-  if (sessionStorage.getItem('hasamisa_perf') === 'true') {
+  if (localStorage.getItem('hasamisa_perf') === 'true') {
     document.documentElement.classList.add('perf-mode');
     document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('perf-mode');
@@ -17,7 +15,7 @@
 
   // 2. Custom cursor — CSS already hides it globally via * { cursor: none }.
   //    Only restore native cursor if user turned custom cursor OFF.
-  if (sessionStorage.getItem('hasamisa_cursor') === 'false') {
+  if (localStorage.getItem('hasamisa_cursor') === 'false') {
     const styleEl = document.createElement('style');
     styleEl.id = 'universal-cursor-style';
     styleEl.innerHTML = `
@@ -30,15 +28,10 @@
       input[type="range"], .slider-handle { cursor: ew-resize !important; }
     `;
     document.head.appendChild(styleEl);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const customCursor = document.querySelector('.custom-cursor');
-      if (customCursor) customCursor.style.display = 'none';
-    });
   }
 
   // 3. Moths
-  if (sessionStorage.getItem('hasamisa_moths') === 'false') {
+  if (localStorage.getItem('hasamisa_moths') === 'false') {
     window.PARTICLES_ENABLED = false;
   }
 })();
@@ -48,6 +41,10 @@
 const createCursor = () => {
   const cursor = document.createElement('div');
   cursor.classList.add('custom-cursor');
+  
+  if (localStorage.getItem('hasamisa_cursor') === 'false') {
+    cursor.style.display = 'none';
+  }
 
   // The lantern element
   const lantern = document.createElement('div');
@@ -121,6 +118,7 @@ const createCursor = () => {
       if (el.dataset.cursorBound) return;
       el.dataset.cursorBound = 'true';
       el.addEventListener('mouseenter', () => {
+        if (localStorage.getItem('hasamisa_cursor') === 'false') return;
         const customCursor = document.querySelector('.custom-cursor');
         if (customCursor) customCursor.classList.add('hover');
         if (typeof AudioManager !== 'undefined') {
@@ -129,6 +127,7 @@ const createCursor = () => {
         }
       });
       el.addEventListener('mouseleave', () => {
+        if (localStorage.getItem('hasamisa_cursor') === 'false') return;
         const customCursor = document.querySelector('.custom-cursor');
         if (customCursor) customCursor.classList.remove('hover');
         if (typeof AudioManager !== 'undefined') {
@@ -388,7 +387,7 @@ async function loadDynamicGallery() {
 
     const renderMedia = (src, className = '', alt = '') => {
       if (isVideo(src)) {
-        return `<video class="${className}" src="${src}" autoplay loop muted playsinline loading="lazy"></video>`;
+        return `<video class="${className}" src="${src}" autoplay loop muted playsinline preload="auto"></video>`;
       }
       return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
     };
@@ -474,17 +473,32 @@ async function loadDynamicGallery() {
       if (gamesGrid) {
         gamesGrid.innerHTML = '';
         categories.games.forEach(game => {
-          gamesGrid.innerHTML += `
-            <a href="${game.link}" style="text-decoration:none;">
-              <div class="skill-card glass-card tilt-effect dynamic-card">
+          const isProjectLink = game.link && game.link.startsWith('/projects/');
+          const projectId = isProjectLink ? game.link.split('/projects/')[1].replace('.html', '') : null;
+          
+          if (isProjectLink) {
+            gamesGrid.innerHTML += `
+              <div class="skill-card glass-card tilt-effect dynamic-card" style="cursor:pointer;" onclick="navigateToProject('${projectId}')">
                 <div class="media-container" style="margin-bottom: 1.5rem;">
                   ${renderMedia(game.image, `ambient-img ${game.animation || ''}`, game.title)}
                 </div>
                 <h3>${game.title}</h3>
                 <p>${game.desc}</p>
               </div>
-            </a>
-          `;
+            `;
+          } else {
+            gamesGrid.innerHTML += `
+              <a href="${game.link}" style="text-decoration:none;">
+                <div class="skill-card glass-card tilt-effect dynamic-card">
+                  <div class="media-container" style="margin-bottom: 1.5rem;">
+                    ${renderMedia(game.image, `ambient-img ${game.animation || ''}`, game.title)}
+                  </div>
+                  <h3>${game.title}</h3>
+                  <p>${game.desc}</p>
+                </div>
+              </a>
+            `;
+          }
         });
       }
     }
@@ -833,9 +847,15 @@ function initLightbox() {
         // Ignore clicks on handles
         if (e.target.closest('.slider-handle')) return;
 
-        // Routing Logic
+        // Routing Logic — use SPA navigation for project links
         if (card.dataset.link) {
-          window.location.href = card.dataset.link;
+          const link = card.dataset.link;
+          if (link.startsWith('/projects/')) {
+            const projectId = link.split('/projects/')[1].replace('.html', '');
+            navigateToProject(projectId);
+          } else {
+            window.location.href = link;
+          }
           return;
         }
 
@@ -1206,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* --- Dynamic Audio Manager --- */
 const AudioManager = {
-  isMuted: true, // Auto-play policies usually require this to be true initially
+  isMuted: true,
   hasInteracted: false,
   sounds: {
     ambient1: null,
@@ -1221,14 +1241,15 @@ const AudioManager = {
   // Custom Overlapping Loop Settings mapping directly to seconds
   ambientSettings: {
     transitionDelaySeconds: 53.00,  // End of ambient 1 / Start of ambient 2
-    ambient2OverlapDelay: 39.83     // Loop trigger point for overlapping (39s + (20frames/24fps))
+    ambient2OverlapDelay: 39.83     // Loop trigger point for overlapping
   },
   nextAmbient2Track: 'ambient2A',
 
   init() {
-    // Apply saved volumes from sessionStorage (persisted settings)
-    const savedAmbientVol = parseFloat(sessionStorage.getItem('hasamisa_ambientVol') ?? '1');
-    const savedSfxVol = parseFloat(sessionStorage.getItem('hasamisa_sfxVol') ?? '1');
+    if (this.sounds.ambient1) return; // Already initialized
+
+    const savedAmbientVol = parseFloat(localStorage.getItem('hasamisa_ambientVol') ?? '1');
+    const savedSfxVol = parseFloat(localStorage.getItem('hasamisa_sfxVol') ?? '1');
     const baseVolumes = { ambient1: 0.5, ambient2A: 0.3, ambient2B: 0.3, lantern: 0.5, hover: 0.4, click: 0.8, glitch: 0.6 };
 
     this.sounds.ambient1 = new Audio('/audio/ambient1.mp3');
@@ -1256,68 +1277,36 @@ const AudioManager = {
 
     this.sounds.glitch = new Audio('/audio/glitch.mp3');
     this.sounds.glitch.volume = baseVolumes.glitch * savedSfxVol;
+  },
 
-    // Restore ambient playback position from sessionStorage (cross-page continuity)
-    const savedAmbient1Time = parseFloat(sessionStorage.getItem('hasamisa_ambient1Time') || '0');
-    const savedAmbient2Active = sessionStorage.getItem('hasamisa_ambient2Active') === 'true';
-    const savedAmbient2Time = parseFloat(sessionStorage.getItem('hasamisa_ambient2Time') || '0');
-    const savedHasInteracted = sessionStorage.getItem('hasamisa_audioStarted') === 'true';
+  // Called once on user's first click (start button or any click)
+  startPlayback() {
+    if (this.hasInteracted) return;
+    this.hasInteracted = true;
+    this.isMuted = false;
 
-    // Save position before unloading so blog->main or main->blog is seamless
-    window.addEventListener('beforeunload', () => {
-      if (this.hasInteracted) {
-        if (this.sounds.ambient1) sessionStorage.setItem('hasamisa_ambient1Time', this.sounds.ambient1.currentTime);
-        const a2 = this.sounds.ambient2A?.paused === false ? this.sounds.ambient2A : this.sounds.ambient2B;
-        sessionStorage.setItem('hasamisa_ambient2Active', (!a2?.paused).toString());
-        if (a2) sessionStorage.setItem('hasamisa_ambient2Time', a2.currentTime);
-        sessionStorage.setItem('hasamisa_audioStarted', 'true');
-      }
-    });
-
-    // If user already interacted in this session, resume audio immediately
-    if (savedHasInteracted && sessionStorage.getItem('hasamisa_visited') === 'true') {
-      this.hasInteracted = true;
-      this.isMuted = false;
-      if (savedAmbient1Time > 0 && !this.sounds.ambient1.ended) {
-        this.sounds.ambient1.currentTime = Math.min(savedAmbient1Time, this.ambientSettings.transitionDelaySeconds - 0.5);
-        this.play('ambient1');
-        // Schedule ambient2 for remaining time
-        const remaining = this.ambientSettings.transitionDelaySeconds - savedAmbient1Time;
-        if (remaining > 0) {
-          setTimeout(() => this.playOverlappingAmbient2(), remaining * 1000);
-        } else {
-          this.playOverlappingAmbient2();
-        }
-      } else {
-        // ambient1 already finished, resume ambient2
-        if (savedAmbient2Active) {
-          const track = this.sounds.ambient2A;
-          track.currentTime = savedAmbient2Time;
-          this.play('ambient2A');
-          const remaining = this.ambientSettings.ambient2OverlapDelay - savedAmbient2Time;
-          setTimeout(() => this.playOverlappingAmbient2(), Math.max(0, remaining) * 1000);
-        } else {
-          this.playOverlappingAmbient2();
-        }
-      }
-      this.play('lantern');
-      return; // Don't add the 'once' click listener again
-    }
-
-    // First-ever interaction in this session
-    window.addEventListener('click', () => {
-      if (this.lightboxOpen) return;
-      if (!this.hasInteracted) {
-        this.hasInteracted = true;
-        this.isMuted = false;
-        sessionStorage.setItem('hasamisa_audioStarted', 'true');
-        this.play('ambient1');
+    // Try to play — if browser blocks it (no user gesture), reset and retry on click
+    const p = this.sounds.ambient1.play();
+    if (p && p.then) {
+      p.then(() => {
+        // Audio started successfully — schedule ambient2 and lantern
         setTimeout(() => {
           this.playOverlappingAmbient2();
         }, this.ambientSettings.transitionDelaySeconds * 1000);
         this.play('lantern');
-      }
-    }, { once: true });
+      }).catch(() => {
+        // Autoplay blocked — reset state and wait for a real user click
+        this.hasInteracted = false;
+        this.isMuted = true;
+        window.addEventListener('click', () => this.startPlayback(), { once: true });
+      });
+    } else {
+      // Fallback for browsers that don't return a promise
+      setTimeout(() => {
+        this.playOverlappingAmbient2();
+      }, this.ambientSettings.transitionDelaySeconds * 1000);
+      this.play('lantern');
+    }
   },
 
   playOverlappingAmbient2() {
@@ -1373,24 +1362,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('start-btn');
   const cursor = document.querySelector('.custom-cursor');
 
-  // Check session storage to see if user already dismissed it this session
   const hasVisited = sessionStorage.getItem('hasamisa_visited');
+
+  // Always init AudioManager (creates Audio objects but doesn't play yet)
+  AudioManager.init();
 
   if (landingOverlay) {
     if (hasVisited === 'true') {
-      // User already clicked start previously, remove it immediately
+      // Already visited this session — remove overlay, start audio
       landingOverlay.style.display = 'none';
       setTimeout(() => landingOverlay.remove(), 10);
       document.body.style.overflow = '';
-      if (typeof AudioManager !== 'undefined') AudioManager.init();
+      AudioManager.startPlayback();
     } else {
-      // Lock scroll while overlay is visible
       document.body.style.overflow = 'hidden';
     }
+  } else {
+    // Blog page loaded directly (not via SPA) — wait for user click to start audio
+    window.addEventListener('click', () => AudioManager.startPlayback(), { once: true });
   }
 
   if (startBtn && landingOverlay && hasVisited !== 'true') {
-    // Show rotating lens cursor on hover over the start button
     startBtn.addEventListener('mouseenter', () => {
       if (cursor) cursor.classList.add('hover');
     });
@@ -1399,37 +1391,112 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startBtn.addEventListener('click', () => {
-      // Unlock scroll
       document.body.style.overflow = '';
-
-      // Initialize Audio on User Interaction
-      if (typeof AudioManager !== 'undefined') {
-        AudioManager.init();
-      }
-      
-      // Save state so it doesn't reappear
       sessionStorage.setItem('hasamisa_visited', 'true');
-      
-      // Fade out and remove overlay
+      AudioManager.startPlayback();
+
       landingOverlay.classList.add('fade-out');
-      setTimeout(() => {
-        landingOverlay.remove();
-      }, 800);
+      setTimeout(() => landingOverlay.remove(), 800);
     });
-  } else if (!landingOverlay) {
-    // If not on landing page, init audio directly so click listeners bind
-    if (typeof AudioManager !== 'undefined') AudioManager.init();
+  }
+});
+
+// =====================================================================
+// SPA NAVIGATION — Navigate to projects without full page reload.
+// Audio keeps playing because we never leave the page.
+// =====================================================================
+window._mainPageScrollY = 0;
+
+window.navigateToProject = (projectId) => {
+  // Save scroll position
+  window._mainPageScrollY = window.scrollY;
+
+  // Hide main page content
+  const mainNav = document.getElementById('main-nav');
+  const mainContent = document.querySelector('main');
+  const footer = document.querySelector('footer');
+  const settingsContainer = document.querySelector('.settings-container');
+  if (mainNav) mainNav.style.display = 'none';
+  if (mainContent) mainContent.style.display = 'none';
+  if (footer) footer.style.display = 'none';
+
+  // Show project wrapper
+  const wrapper = document.getElementById('project-page-wrapper');
+  wrapper.style.display = 'block';
+
+  // Render project content
+  renderProjectPage(projectId);
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+
+  // Update URL without reload
+  history.pushState({ project: projectId }, '', '/projects/' + projectId);
+
+  // Re-bind cursor hovers for the project nav
+  if (window.bindCursorHover) setTimeout(() => window.bindCursorHover(), 200);
+};
+
+window.navigateHome = (hash) => {
+  // Hide project wrapper and clear its content
+  const wrapper = document.getElementById('project-page-wrapper');
+  wrapper.style.display = 'none';
+  document.getElementById('project-container').innerHTML = '';
+
+  // Show main page content
+  const mainNav = document.getElementById('main-nav');
+  const mainContent = document.querySelector('main');
+  const footer = document.querySelector('footer');
+  if (mainNav) mainNav.style.display = '';
+  if (mainContent) mainContent.style.display = '';
+  if (footer) footer.style.display = '';
+
+  // Update URL
+  history.pushState(null, '', '/' + (hash || ''));
+
+  // Restore scroll or scroll to hash target
+  if (hash) {
+    const target = document.getElementById(hash.replace('#', ''));
+    if (target) {
+      setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 50);
+    }
+  } else {
+    window.scrollTo(0, window._mainPageScrollY || 0);
+  }
+};
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.project) {
+    navigateToProject(e.state.project);
+  } else {
+    // Going back to home
+    const wrapper = document.getElementById('project-page-wrapper');
+    if (wrapper && wrapper.style.display !== 'none') {
+      // We're on a project page, go back to main
+      wrapper.style.display = 'none';
+      document.getElementById('project-container').innerHTML = '';
+      document.getElementById('main-nav').style.display = '';
+      document.querySelector('main').style.display = '';
+      document.querySelector('footer').style.display = '';
+      window.scrollTo(0, window._mainPageScrollY || 0);
+    }
+  }
+});
+
+// Bind the project back button
+document.addEventListener('DOMContentLoaded', () => {
+  const backBtn = document.getElementById('project-back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateHome('#games');
+    });
   }
 });
 
 // --- SETTINGS PANEL LOGIC --- //
 document.addEventListener('DOMContentLoaded', () => {
-  const landingOverlay = document.getElementById('landing-overlay');
-  
-  if (!landingOverlay && typeof AudioManager !== 'undefined') {
-    AudioManager.init();
-  }
-  
   const settingsTrigger = document.getElementById('settings-trigger');
   const settingsDropdown = document.querySelector('.settings-dropdown');
   const toggleMoths = document.getElementById('toggle-moths');
@@ -1438,26 +1505,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const ambientVolSlider = document.getElementById('ambient-vol');
   const sfxVolSlider = document.getElementById('sfx-vol');
 
-  // --- Restore persisted settings (only if visited state is active) ---
-  const hasVisited = sessionStorage.getItem('hasamisa_visited') === 'true';
-  if (hasVisited) {
-    const savedAmbientVol = sessionStorage.getItem('hasamisa_ambientVol');
-    const savedSfxVol = sessionStorage.getItem('hasamisa_sfxVol');
-    const savedPerf = sessionStorage.getItem('hasamisa_perf');
-    const savedCursor = sessionStorage.getItem('hasamisa_cursor');
-    const savedMoths = sessionStorage.getItem('hasamisa_moths');
+  // --- Restore persisted settings ---
+  const savedAmbientVol = localStorage.getItem('hasamisa_ambientVol');
+  const savedSfxVol = localStorage.getItem('hasamisa_sfxVol');
+  const savedPerf = localStorage.getItem('hasamisa_perf');
+  const savedCursor = localStorage.getItem('hasamisa_cursor');
+  const savedMoths = localStorage.getItem('hasamisa_moths');
 
-    if (ambientVolSlider && savedAmbientVol !== null) ambientVolSlider.value = savedAmbientVol;
-    if (sfxVolSlider && savedSfxVol !== null) sfxVolSlider.value = savedSfxVol;
-    if (togglePerf && savedPerf !== null) {
-      togglePerf.checked = savedPerf === 'true';
-      if (savedPerf === 'true') document.body.classList.add('perf-mode');
-    }
-    if (toggleCursors && savedCursor !== null) toggleCursors.checked = savedCursor === 'true';
-    if (toggleMoths && savedMoths !== null) {
-      toggleMoths.checked = savedMoths === 'true';
-      window.PARTICLES_ENABLED = savedMoths === 'true';
-    }
+  if (ambientVolSlider && savedAmbientVol !== null) ambientVolSlider.value = savedAmbientVol;
+  if (sfxVolSlider && savedSfxVol !== null) sfxVolSlider.value = savedSfxVol;
+  if (togglePerf && savedPerf !== null) {
+    togglePerf.checked = savedPerf === 'true';
+    if (savedPerf === 'true') document.body.classList.add('perf-mode');
+  }
+  if (toggleCursors && savedCursor !== null) toggleCursors.checked = savedCursor === 'true';
+  if (toggleMoths && savedMoths !== null) {
+    toggleMoths.checked = savedMoths === 'true';
+    window.PARTICLES_ENABLED = savedMoths === 'true';
   }
 
   if (settingsTrigger) {
@@ -1474,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggleMoths) {
       toggleMoths.addEventListener('change', (e) => {
         window.PARTICLES_ENABLED = e.target.checked;
-        sessionStorage.setItem('hasamisa_moths', e.target.checked);
+        localStorage.setItem('hasamisa_moths', e.target.checked);
       });
     }
 
@@ -1492,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggleCursors) {
       toggleCursors.addEventListener('change', (e) => {
         const customCursor = document.querySelector('.custom-cursor');
-        sessionStorage.setItem('hasamisa_cursor', e.target.checked);
+        localStorage.setItem('hasamisa_cursor', e.target.checked);
         const styleBlock = getStyleBlock();
         if (e.target.checked) {
           // Custom cursor ON: CSS already hides native cursor, just show custom element
@@ -1519,7 +1583,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ambientVolSlider) {
         ambientVolSlider.addEventListener('input', (e) => {
           const masterVol = parseFloat(e.target.value);
-          sessionStorage.setItem('hasamisa_ambientVol', masterVol);
+          localStorage.setItem('hasamisa_ambientVol', masterVol);
           ['ambient1', 'ambient2A', 'ambient2B'].forEach(key => {
             if (AudioManager.sounds[key]) AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
           });
@@ -1529,7 +1593,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sfxVolSlider) {
         sfxVolSlider.addEventListener('input', (e) => {
           const masterVol = parseFloat(e.target.value);
-          sessionStorage.setItem('hasamisa_sfxVol', masterVol);
+          localStorage.setItem('hasamisa_sfxVol', masterVol);
           ['lantern', 'hover', 'click', 'glitch'].forEach(key => {
             if (AudioManager.sounds[key]) AudioManager.sounds[key].volume = baseVolumes[key] * masterVol;
           });
@@ -1539,7 +1603,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (togglePerf) {
       togglePerf.addEventListener('change', (e) => {
-        sessionStorage.setItem('hasamisa_perf', e.target.checked);
+        localStorage.setItem('hasamisa_perf', e.target.checked);
         if (e.target.checked) document.body.classList.add('perf-mode');
         else document.body.classList.remove('perf-mode');
       });
