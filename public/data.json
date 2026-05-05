@@ -3,7 +3,7 @@
     {
       "id": "proto",
       "title": "Proto : Last Hope",
-      "desc": "Playable game utilizing advanced Unreal Engine mechanics and custom assets.",
+      "desc": "Top 10 WTFxIGDC GameJam 2024 Entry.",
       "image": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
       "animation": "float",
       "link": "/projects/proto.html"
@@ -11,7 +11,7 @@
     {
       "id": "grandpa",
       "title": "Putting Grandpa Back Together",
-      "desc": "Top 10 India GameJam 2024 Entry.",
+      "desc": "BYOG GameJam 2024 Entry.",
       "image": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
       "animation": "pulse",
       "link": "/projects/grandpa.html"
@@ -19,7 +19,7 @@
     {
       "id": "ganja-mafia",
       "title": "Ganja Mafia",
-      "desc": "Action-packed mafia exploration crafted with passion and unique mechanics.",
+      "desc": "Action-packed mafia stealth crafted with unique mechanics for GameJam.",
       "image": "https://cgarthro.carrd.co/assets/images/gallery01/82299fdb.jpg",
       "animation": "float",
       "link": "/projects/ganja-mafia.html"
@@ -136,6 +136,7 @@
     {
       "title": "New Year Banner",
       "image": "/images/newyear.mp4",
+      "hdImage": "/images/newyear.mp4",
       "aspectRatio": "16/9"
     }
   ],

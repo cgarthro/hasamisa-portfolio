@@ -551,6 +551,9 @@ async function loadDynamicGallery() {
     if (typeof calculateCardDimensions === 'function') calculateCardDimensions();
     if (typeof updateGalleryDimensions === 'function') setTimeout(updateGalleryDimensions, 100);
 
+    // Re-bind 3D tilt for dynamically loaded cards
+    if (window.bindTiltEffect) window.bindTiltEffect();
+
   } catch (error) {
     console.error('JSON Load Error:', error);
   }
@@ -746,27 +749,31 @@ function update3DScroll() {
 update3DScroll();
 
 // 5. 3D Hover Tilt for Grid Cards (same pattern as hasamisa-studio)
-const tiltCards = document.querySelectorAll('.tilt-effect');
+window.bindTiltEffect = (scope = document) => {
+  const tiltCards = scope.querySelectorAll('.tilt-effect');
+  tiltCards.forEach(card => {
+    if (card.dataset.tiltBound) return;
+    card.dataset.tiltBound = 'true';
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-tiltCards.forEach(card => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
 
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -10;
+      const rotateY = ((x - centerX) / centerX) * 10;
 
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
 
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    });
   });
-
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-  });
-});
+};
+window.bindTiltEffect();
 
 // 6. Anti-Save & Right-Click Prevention Global
 document.addEventListener('contextmenu', e => e.preventDefault());
@@ -1163,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Global click audio delegation
   document.body.addEventListener('click', (e) => {
-    if (e.target.closest('a, button, .project-showcase, input, .lightbox-close, .switcher__option')) {
+    if (e.target.closest('a, button, .project-showcase, input, .lightbox-close, .switcher__option, .asset-card, .story-image-card, .liquid-button, .spec-item, .skill-card')) {
       if (typeof AudioManager !== 'undefined') {
         AudioManager.play('click');
       }
@@ -1433,6 +1440,20 @@ window.navigateToProject = (projectId) => {
   // Update URL without reload
   history.pushState({ project: projectId }, '', '/projects/' + projectId);
 
+  // Initialize project nav pill position on the "Overview" button
+  setTimeout(() => {
+    const projectNav = document.getElementById('project-nav');
+    if (projectNav) {
+      const overviewRadio = projectNav.querySelector('input[value="overview"]');
+      if (overviewRadio) overviewRadio.checked = true;
+      const checkedLabel = overviewRadio ? overviewRadio.closest('.switcher__option') : null;
+      if (checkedLabel) {
+        projectNav.style.setProperty('--pill-left', `${checkedLabel.offsetLeft}px`);
+        projectNav.style.setProperty('--pill-width', `${checkedLabel.offsetWidth}px`);
+      }
+    }
+  }, 50);
+
   // Re-bind cursor hovers for the project nav
   if (window.bindCursorHover) setTimeout(() => window.bindCursorHover(), 200);
 };
@@ -1484,13 +1505,41 @@ window.addEventListener('popstate', (e) => {
   }
 });
 
-// Bind the project back button
+// Bind the project back button and nav pill
 document.addEventListener('DOMContentLoaded', () => {
   const backBtn = document.getElementById('project-back-btn');
+  const projectNav = document.getElementById('project-nav');
+
+  // Make the project nav pill respond to radio changes
+  if (projectNav) {
+    const projectRadios = projectNav.querySelectorAll('.switcher__input');
+    projectRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const label = radio.closest('.switcher__option');
+        if (label) {
+          projectNav.style.setProperty('--pill-left', `${label.offsetLeft}px`);
+          projectNav.style.setProperty('--pill-width', `${label.offsetWidth}px`);
+        }
+      });
+    });
+  }
+
   if (backBtn) {
     backBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      navigateHome('#games');
+      // Play click sound
+      if (typeof AudioManager !== 'undefined') AudioManager.play('click');
+      // Slide pill to the Back button first
+      if (projectNav) {
+        const backLabel = backBtn.closest('.switcher__option') || backBtn;
+        projectNav.style.setProperty('--pill-left', `${backLabel.offsetLeft}px`);
+        projectNav.style.setProperty('--pill-width', `${backLabel.offsetWidth}px`);
+      }
+      // Smooth scroll to top, then navigate home after delay
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        navigateHome('#games');
+      }, 500);
     });
   }
 });
