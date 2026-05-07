@@ -1,4 +1,40 @@
 {
+  "site": {
+    "title": "Hasamisa 3D | Luxury Portfolio",
+    "heroName1": "CG ",
+    "heroName2": "Arthr0",
+    "heroSubtitle": "3D Generalist | Technical Artist",
+    "heroDesc": "Versatile polymath & self-taught 3D Artist specializing in modeling, shading, and technical art.",
+    "heroButton": "Explore Work",
+    "nav": ["Home", "Stills", "Products", "Animations", "Games", "About"],
+    "sections": {
+      "stills": {
+        "heading": "3D Still Renders",
+        "desc": "Click any card to reveal <span class=\"cyan-text\">4K Details</span> and interactive <span class=\"cyan-text\">Process Sliders</span>."
+      },
+      "products": {
+        "heading": "3D Product Renders",
+        "desc": "Click to load uncompressed <span class=\"cyan-text\">Studio Lighting passes</span>."
+      },
+      "animations": {
+        "heading": "Animations & Sims",
+        "desc": "Click to enter the <span class=\"cyan-text\">Cinematic Theater</span> mode."
+      },
+      "games": {
+        "heading": "Games Developed"
+      },
+      "skills": {
+        "heading": "Multidisciplinary Expertise"
+      }
+    },
+    "footer": "&copy; 2026 Hasamisa Studio. Designed with <span class=\"cyan-text\">Precision</span>.",
+    "overlay": {
+      "title": "Optimal Experience",
+      "text": "This portfolio is a 3D visual journey best experienced on <strong>Desktop (PC)</strong>.",
+      "subtext": "If you experience lag on mobile or older hardware, please use the <strong>Settings (Gear Icon)</strong> in the top-right to enable \"FPS Perf Mode\".",
+      "button": "EXPLORE PORTFOLIO"
+    }
+  },
   "games": [
     {
       "id": "proto",

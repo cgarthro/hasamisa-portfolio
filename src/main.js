@@ -379,6 +379,56 @@ async function loadDynamicGallery() {
 
     const categories = await response.json();
 
+    // --- Populate main page text from site config ---
+    if (categories.site) {
+      const s = categories.site;
+      // Page title
+      if (s.title) document.title = s.title;
+      // Hero
+      const heroH1 = document.querySelector('#home .chromatic-text');
+      if (heroH1 && s.heroName1 && s.heroName2) {
+        heroH1.setAttribute('data-text', s.heroName1 + s.heroName2);
+        heroH1.innerHTML = `${s.heroName1}<span class="cyan-text">${s.heroName2}</span>`;
+      }
+      const heroSub = document.querySelector('.hero-subtitle');
+      if (heroSub && s.heroSubtitle) heroSub.textContent = s.heroSubtitle;
+      const heroDesc = document.querySelector('.hero-desc');
+      if (heroDesc && s.heroDesc) heroDesc.textContent = s.heroDesc;
+      const heroBtn = document.querySelector('.hero .liquid-button span');
+      if (heroBtn && s.heroButton) heroBtn.textContent = s.heroButton;
+      // Nav labels
+      if (s.nav && s.nav.length) {
+        const navTexts = document.querySelectorAll('#main-nav .switcher__text');
+        s.nav.forEach((label, i) => { if (navTexts[i]) navTexts[i].textContent = label; });
+      }
+      // Section headings & descriptions
+      if (s.sections) {
+        Object.entries(s.sections).forEach(([key, sec]) => {
+          const heading = document.querySelector(`#${key} .chromatic-text`);
+          if (heading && sec.heading) {
+            heading.setAttribute('data-text', sec.heading);
+            heading.textContent = sec.heading;
+          }
+          const desc = document.querySelector(`#${key} .section-subtext`);
+          if (desc && sec.desc) desc.innerHTML = sec.desc;
+        });
+      }
+      // Footer
+      const footer = document.querySelector('footer p');
+      if (footer && s.footer) footer.innerHTML = s.footer;
+      // Overlay
+      if (s.overlay) {
+        const ot = document.querySelector('.overlay-title');
+        if (ot) ot.textContent = s.overlay.title;
+        const otxt = document.querySelector('.overlay-text');
+        if (otxt) otxt.innerHTML = s.overlay.text;
+        const osub = document.querySelector('.overlay-subtext');
+        if (osub) osub.innerHTML = s.overlay.subtext;
+        const obtn = document.querySelector('.landing-start-btn .liquidGlass-text');
+        if (obtn) obtn.textContent = s.overlay.button;
+      }
+    }
+
     const isVideo = (path) => {
       if (!path) return false;
       const ext = path.split('.').pop().toLowerCase();
@@ -402,7 +452,7 @@ async function loadDynamicGallery() {
     };
 
     Object.keys(categories).forEach(categoryKey => {
-      if (categoryKey === 'games' || categoryKey === 'skills') return;
+      if (categoryKey === 'games' || categoryKey === 'skills' || categoryKey === 'site' || categoryKey === 'projects') return;
       const track = document.getElementById(`${categoryKey}-track`);
       if (!track) return;
       track.innerHTML = ''; // Ensure cleanly empty
@@ -1698,7 +1748,7 @@ window.renderProjectPage = async (projectId) => {
       <section class="story-section visible">
         <div class="story-grid">
           <div class="story-text">
-            <h2>${project.visionTitle}</h2>
+            <h2 class="chromatic-text" data-text="${project.visionTitle}">${project.visionTitle}</h2>
             <p>${project.visionText}</p>
             <div class="tech-specs">
               ${project.specs.map(s => `
@@ -1717,7 +1767,7 @@ window.renderProjectPage = async (projectId) => {
     // Deep Dive
     const deepDiveHTML = `
       <section class="story-section visible">
-        <h2>${project.deepDiveTitle}</h2>
+        <h2 class="chromatic-text" data-text="${project.deepDiveTitle}">${project.deepDiveTitle}</h2>
         <div class="story-grid">
           <div class="asset-card story-image-card" data-hd="${project.deepDiveImage}"><div class="media-container" style="border:none;background:none;box-shadow:none;"><img src="${project.deepDiveImage}" alt="Deep Dive" class="story-image"></div></div>
           <div class="story-text">
@@ -1730,7 +1780,7 @@ window.renderProjectPage = async (projectId) => {
     // Gallery
     const galleryHTML = `
       <section class="story-section visible">
-        <h2>Asset Gallery</h2>
+        <h2 class="chromatic-text" data-text="Asset Gallery">Asset Gallery</h2>
         <p class="story-text">${project.galleryText}</p>
         <div class="asset-grid">
           ${project.assets.map(a => `
@@ -1747,7 +1797,7 @@ window.renderProjectPage = async (projectId) => {
     // CTA
     const ctaHTML = `
       <section class="story-section cta-container visible">
-        <h2>Experience the Game</h2>
+        <h2 class="chromatic-text" data-text="Experience the Game">Experience the Game</h2>
         <p class="story-text" style="margin-bottom: 30px;">Play the game now on Itch.io.</p>
         <a href="${project.itchLink}" target="_blank" style="text-decoration:none;">
           <button class="liquid-button">
