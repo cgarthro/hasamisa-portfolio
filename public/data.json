@@ -4,7 +4,7 @@
       "id": "proto",
       "title": "Proto : Last Hope",
       "desc": "Top 10 WTFxIGDC GameJam 2024 Entry.",
-      "image": "https://cgarthro.carrd.co/assets/images/gallery01/fe924e11.jpg",
+      "image": "/images/proto.webp",
       "animation": "float",
       "link": "/projects/proto.html"
     },
@@ -12,7 +12,7 @@
       "id": "grandpa",
       "title": "Putting Grandpa Back Together",
       "desc": "BYOG GameJam 2024 Entry.",
-      "image": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "image": "/images/grandpa.webp",
       "animation": "pulse",
       "link": "/projects/grandpa.html"
     },
@@ -146,10 +146,10 @@
       "titlePath2": "Last Hope",
       "meta": [
         "Unity",
-        "Game Assets, Environment & Shaders",
+        "Top 10 Finalist",
         "Puzzle/Platformer/Adventure"
       ],
-      "heroBg": "/images/proto.jpg",
+      "heroBg": "/images/proto.webp",
       "visionTitle": "The Vision",
       "visionText": "Built in just 48 hours for the WTF x IGDC Game Jam, Proto: Last Hope is a fast-paced puzzle-adventure about a small robot racing through a high-tech lab to synthesize a cure. Working in a team of five, we stripped the scope to what mattered most: clear mechanics, strong visual feedback, and tight collaboration. Despite the extreme deadline, our focused communication and rapid iteration earned us a Top 10 placement. This project shows I can align with a team, make decisive creative calls under pressure, and ship a polished, emotionally engaging experience on a tight timeline.",
       "specs": [
@@ -232,15 +232,14 @@
       "itchLink": "https://cgarthr0.itch.io/proto-lasthope"
     },
     "grandpa": {
-      "titlePath1": "Putting ",
-      "titlePath2": "Grandpa",
-      "titlePath3": " Back Together",
+      "titlePath1": "Putting Grandpa ",
+      "titlePath2": "Back Together",
       "meta": [
-        "Game Jam",
-        "Top 10 Finalist",
-        "Quick Prototyping"
+        "Unity",
+        "Game Assets, Environment & Shaders",
+        "Platformer/Adventure"
       ],
-      "heroBg": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "heroBg": "/images/grandpa.webp",
       "visionTitle": "The Jam",
       "visionText": "Created for the India GameJam 2024, Putting Grandpa Back Together is a quirky, fast-paced puzzle/physics game where you literally have to assemble various limbs of a chaotic grandpa character. Placing Top 10 in the jam, it highlights an ability to conceptualize, model, code, and polish a core loop within a 48-hour pressure cooker.",
       "specs": [
@@ -253,10 +252,10 @@
           "val": "48 Hrs"
         }
       ],
-      "visionImage": "https://cgarthro.carrd.co/assets/images/gallery01/eabbce63.jpg",
+      "visionImage": "/images/grandpa1.webp",
       "deepDiveTitle": "Technical Deep Dive",
       "deepDiveText": "The core puzzle mechanic relied heavily on custom ragdoll physics and joint detection. Fast iteration was key, requiring highly modular assets and a flexible game manager framework constructed from the ground up over a single weekend.",
-      "deepDiveImage": "https://via.placeholder.com/800x450/111111/0CAEB9?text=Physics+Debug+Shot",
+      "deepDiveImage": "/images/grandpa2.webp",
       "galleryText": "A collection of quickly modeled, textured, and rigged game jam assets. Click to expand.",
       "assets": [
         {
