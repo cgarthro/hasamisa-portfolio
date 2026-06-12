@@ -50,49 +50,95 @@ const createCursor = () => {
   const lantern = document.createElement('div');
   lantern.classList.add('cursor-lantern');
   lantern.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="72" viewBox="0 0 56 72" fill="none">
-      <!-- Hanging ring -->
-      <circle cx="28" cy="5" r="4" stroke="rgba(17,164,212,0.5)" stroke-width="1.2" fill="none"/>
-      <!-- Chain -->
-      <line x1="28" y1="9" x2="28" y2="16" stroke="rgba(17,164,212,0.4)" stroke-width="1.2" stroke-dasharray="2 1.5"/>
+    <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 100px; overflow: visible;">
+      <defs>
+        <radialGradient id="lanternGlass" cx="50%" cy="50%" r="60%">
+          <stop offset="0%"  stop-color="#b8f8ff" stop-opacity="0.95"/>
+          <stop offset="50%" stop-color="#33e0ff" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#0091a8" stop-opacity="0.35"/>
+        </radialGradient>
+        <linearGradient id="frame" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"  stop-color="#5ff5ff"/>
+          <stop offset="100%" stop-color="#0a6b7a"/>
+        </linearGradient>
+        <linearGradient id="cap" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"  stop-color="#9ffaff"/>
+          <stop offset="100%" stop-color="#1a8fa3"/>
+        </linearGradient>
+        <radialGradient id="fireCore" cx="50%" cy="65%" r="50%">
+          <stop offset="0%"  stop-color="#ffffff" stop-opacity="1"/>
+          <stop offset="25%" stop-color="#b8f8ff" stop-opacity="0.95"/>
+          <stop offset="60%" stop-color="#33e0ff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#006978" stop-opacity="0"/>
+        </radialGradient>
+
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="globalBlur">
+          <feGaussianBlur stdDeviation="1.5"/>
+        </filter>
+
+        <!-- Flame gradients -->
+        <radialGradient id="coreGradient" cx="50%" cy="30%" r="60%">
+          <stop offset="0%"  stop-color="#ffffff"/>
+          <stop offset="40%" stop-color="#00ffff"/>
+          <stop offset="100%" stop-color="#005577" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <g transform="translate(0 6) scale(1 0.85)">
+      <!-- Handle ring -->
+      <g filter="url(#softGlow)"><circle cx="200" cy="40" r="10" fill="none" stroke="url(#cap)" stroke-width="3"/></g>
       <!-- Top cap -->
-      <path d="M18 16 L38 16 L40 20 L16 20 Z" fill="rgba(17,164,212,0.15)" stroke="rgba(17,164,212,0.5)" stroke-width="0.8"/>
-      <!-- Roof vent -->
-      <rect x="24" y="13" width="8" height="3" rx="1" fill="rgba(17,164,212,0.1)" stroke="rgba(17,164,212,0.3)" stroke-width="0.5"/>
-      <!-- Left frame rail -->
-      <line x1="16" y1="20" x2="18" y2="56" stroke="rgba(17,164,212,0.5)" stroke-width="1.2"/>
-      <!-- Right frame rail -->
-      <line x1="40" y1="20" x2="38" y2="56" stroke="rgba(17,164,212,0.5)" stroke-width="1.2"/>
-      <!-- Glass body -->
-      <rect x="18" y="20" width="20" height="36" rx="2" fill="rgba(17,164,212,0.04)" stroke="rgba(17,164,212,0.25)" stroke-width="0.6"/>
-      <!-- Horizontal glass dividers -->
-      <line x1="18" y1="32" x2="38" y2="32" stroke="rgba(17,164,212,0.15)" stroke-width="0.4"/>
-      <line x1="18" y1="44" x2="38" y2="44" stroke="rgba(17,164,212,0.15)" stroke-width="0.4"/>
-      <!-- Vertical glass divider -->
-      <line x1="28" y1="20" x2="28" y2="56" stroke="rgba(17,164,212,0.12)" stroke-width="0.4"/>
-      <!-- Outer flame glow -->
-      <ellipse cx="28" cy="38" rx="17.5" ry="25" fill="rgba(17,164,212,0.12)">
-        <animate attributeName="ry" values="25;20;27.5;25" dur="2s" repeatCount="indefinite"/>
-      </ellipse>
-      <!-- Main flame -->
-      <ellipse cx="28" cy="38" rx="10" ry="17.5" fill="rgba(17,164,212,0.5)">
-        <animate attributeName="ry" values="17.5;14;20;17.5" dur="1.5s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0.5;0.7;0.4;0.5" dur="2s" repeatCount="indefinite"/>
-      </ellipse>
-      <!-- Inner flame core -->
-      <ellipse cx="28" cy="37" rx="5" ry="8.75" fill="rgba(180,240,255,0.9)">
-        <animate attributeName="ry" values="8.75;6.25;10;8.75" dur="1.2s" repeatCount="indefinite"/>
-      </ellipse>
-      <!-- Flame tip -->
-      <ellipse cx="28" cy="28" rx="2.5" ry="5" fill="rgba(220,250,255,0.6)">
-        <animate attributeName="ry" values="5;2.5;6.25;5" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="cy" values="28;26;30;28" dur="1.8s" repeatCount="indefinite"/>
-      </ellipse>
-      <!-- Bottom base plate -->
-      <path d="M16 56 L40 56 L42 60 L14 60 Z" fill="rgba(17,164,212,0.15)" stroke="rgba(17,164,212,0.5)" stroke-width="0.8"/>
-      <!-- Feet -->
-      <rect x="16" y="60" width="4" height="4" rx="1" fill="rgba(17,164,212,0.2)"/>
-      <rect x="36" y="60" width="4" height="4" rx="1" fill="rgba(17,164,212,0.2)"/>
+      <g filter="url(#softGlow)">
+        <path d="M 130 95 L 200 70 L 270 95 L 260 115 L 140 115 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+        <line x1="200" y1="70" x2="200" y2="115" stroke="#b8f8ff" stroke-width="0.8" opacity="0.6"/>
+        <line x1="160" y1="105" x2="240" y2="105" stroke="#b8f8ff" stroke-width="0.6" opacity="0.5"/>
+      </g>
+      <!-- Chain link -->
+      <line x1="200" y1="50" x2="200" y2="70" stroke="#5ff5ff" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+      <line x1="200" y1="50" x2="200" y2="70" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+      <!-- Top lens cap -->
+      <ellipse cx="200" cy="120" rx="75" ry="10" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+      <!-- Lantern body -->
+      <g filter="url(#softGlow)">
+        <path d="M 130 120 C 125 200, 120 280, 135 380 L 265 380 C 280 280, 275 200, 270 120 Z" fill="url(#lanternGlass)" stroke="url(#frame)" stroke-width="2.5"/>
+        <line x1="170" y1="125" x2="167" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="200" y1="125" x2="200" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="230" y1="125" x2="233" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="125" y1="190" x2="275" y2="190" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <line x1="122" y1="270" x2="278" y2="270" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <line x1="128" y1="340" x2="272" y2="340" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <path d="M 150 140 Q 145 250, 155 360" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>
+        <path d="M 158 150 Q 153 250, 162 350" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>
+      </g>
+      <!-- FLAME -->
+      <g transform="translate(85 215) scale(1.2)">
+        <g filter="url(#globalBlur)">
+          <path d="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30" fill="#0088aa" opacity="0.6">
+            <animate attributeName="d" dur="2s" repeatCount="indefinite" values="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30; M100,30 Q135,85 112,155 Q100,115 88,155 Q65,85 100,30; M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30"/>
+          </path>
+          <path d="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50" fill="#00ccff" opacity="0.8">
+            <animate attributeName="d" dur="1.5s" repeatCount="indefinite" values="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50; M100,50 Q125,95 108,145 Q100,120 92,145 Q75,95 100,50; M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50"/>
+          </path>
+          <path d="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70" fill="#ffffff" opacity="0.9">
+            <animate attributeName="d" dur="1s" repeatCount="indefinite" values="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70; M100,70 Q115,100 103,135 Q100,120 97,135 Q85,100 100,70; M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70"/>
+          </path>
+          <path d="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60" fill="url(#coreGradient)" opacity="0.7">
+            <animate attributeName="d" dur="2.5s" repeatCount="indefinite" values="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60; M100,60 Q130,105 105,165 Q100,125 95,165 Q70,105 100,60; M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60"/>
+          </path>
+        </g>
+      </g>
+      <!-- Bottom lens cap -->
+      <ellipse cx="200" cy="380" rx="68" ry="9" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+      <!-- Bottom cap -->
+      <g filter="url(#softGlow)">
+        <path d="M 140 380 L 260 380 L 250 400 L 150 400 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+        <ellipse cx="200" cy="400" rx="50" ry="6" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1"/>
+      </g>
+      </g>
     </svg>`;
   cursor.appendChild(lantern);
 
@@ -107,10 +153,50 @@ const createCursor = () => {
   cursor.style.left = '50%';
   cursor.style.top = '50%';
 
+  // --- Better Motion Physics for Lantern Swing ---
+  lantern.style.transformOrigin = '50% 16%';
+  
+  let angle = 0;
+  let angVel = 0;
+  let lastX = window.innerWidth / 2;
+  let lastY = window.innerHeight / 2;
+  
+  const restoring = 0.005;    // Gravity pull back
+  const airDrag   = 0.04;     // Motion damping
+  const maxAngle  = 45;
+  const sensitivity = 0.9;    // Displacement to angular impulse
+
+  function updateMouse(x, y) {
+    cursor.style.left = `${x}px`;
+    cursor.style.top = `${y}px`;
+
+    const dx = x - lastX;
+    const impulse = Math.max(-40, Math.min(40, dx * sensitivity));
+    angVel += impulse;
+    
+    lastX = x; 
+    lastY = y;
+  }
+
   window.addEventListener('mousemove', (e) => {
-    cursor.style.left = `${e.clientX}px`;
-    cursor.style.top = `${e.clientY}px`;
+    updateMouse(e.clientX, e.clientY);
   });
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  function animFrame() {
+    angVel += -angle * restoring;
+    angVel -= angVel * airDrag;
+    angle += angVel;
+
+    if (angle >  maxAngle) { angle =  maxAngle; angVel *= -0.35; }
+    if (angle < -maxAngle) { angle = -maxAngle; angVel *= -0.35; }
+
+    lantern.style.transform = `translate(-50%, -16%) rotate(${angle}deg)`;
+    requestAnimationFrame(animFrame);
+  }
+  requestAnimationFrame(animFrame);
 
   window.bindCursorHover = (scope = document) => {
     const hoverElements = scope.querySelectorAll('a, button, .skill-card, .project-showcase, input, .settings-wrapper, .settings-dropdown, .asset-card, .story-image-card');

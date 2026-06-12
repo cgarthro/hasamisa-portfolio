@@ -1,12 +1,19 @@
 {
   "site": {
-    "title": "Hasamisa 3D | Luxury Portfolio",
+    "title": "CG Arthr0 | 3D Portfolio",
     "heroName1": "CG ",
     "heroName2": "Arthr0",
     "heroSubtitle": "3D Generalist | Technical Artist",
-    "heroDesc": "Versatile polymath & self-taught 3D Artist specializing in modeling, shading, and technical art.",
+    "heroDesc": "I'm a versatile polymath & self-taught 3D Artist with 4+ years of experience with diverse software and workflows. I specialize in 3D modeling, texturing, shaders, environment design and lighting. ",
     "heroButton": "Explore Work",
-    "nav": ["Home", "Stills", "Products", "Animations", "Games", "About"],
+    "nav": [
+      "Home",
+      "Stills",
+      "Products",
+      "Animations",
+      "Games",
+      "About"
+    ],
     "sections": {
       "stills": {
         "heading": "3D Still Renders",

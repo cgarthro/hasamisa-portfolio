@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>~ LANTERN ~</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #020a14 0%, #000000 70%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      cursor: none; /* hide native cursor, lantern IS the cursor */
+    }
+    h1 {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #6ff7ff;
+      text-shadow: 0 0 10px #00e5ff, 0 0 25px #00b8d4;
+      letter-spacing: 6px;
+      font-weight: 200;
+      font-size: 22px;
+      margin: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    #lantern-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 250px;
+      pointer-events: none;
+      z-index: 9999;
+      transform-origin: 50% 16%; /* pivot = the handle ring */
+      will-change: transform;
+    }
+    #lantern-cursor svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 0 14px rgba(0, 229, 255, 0.55));
+    }
+  </style>
+</head>
+<body>
+  <h1>~ LANTERN ~</h1>
+
+  <div id="lantern-cursor">
+    <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="lanternGlass" cx="50%" cy="50%" r="60%">
+          <stop offset="0%"  stop-color="#b8f8ff" stop-opacity="0.95"/>
+          <stop offset="50%" stop-color="#33e0ff" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#0091a8" stop-opacity="0.35"/>
+        </radialGradient>
+        <linearGradient id="frame" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"  stop-color="#5ff5ff"/>
+          <stop offset="100%" stop-color="#0a6b7a"/>
+        </linearGradient>
+        <linearGradient id="cap" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"  stop-color="#9ffaff"/>
+          <stop offset="100%" stop-color="#1a8fa3"/>
+        </linearGradient>
+        <radialGradient id="fireCore" cx="50%" cy="65%" r="50%">
+          <stop offset="0%"  stop-color="#ffffff" stop-opacity="1"/>
+          <stop offset="25%" stop-color="#b8f8ff" stop-opacity="0.95"/>
+          <stop offset="60%" stop-color="#33e0ff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#006978" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="streakGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"  stop-color="#00e5ff" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#b8f8ff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+        </linearGradient>
+
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="strongGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="6" result="b1"/>
+          <feGaussianBlur stdDeviation="14" in="SourceGraphic" result="b2"/>
+          <feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fireBlur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2"/>
+        </filter>
+
+        <!-- Flame gradients (from the standalone flame SVG) -->
+        <radialGradient id="coreGradient" cx="50%" cy="30%" r="60%">
+          <stop offset="0%"  stop-color="#ffffff"/>
+          <stop offset="40%" stop-color="#00ffff"/>
+          <stop offset="100%" stop-color="#005577" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="ambientGlow" cx="50%" cy="40%" r="50%">
+          <stop offset="0%"  stop-color="#00ccff" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#003344" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="globalBlur">
+          <feGaussianBlur stdDeviation="1.5"/>
+        </filter>
+        <filter id="softAmbient">
+          <feGaussianBlur stdDeviation="4"/>
+        </filter>
+      </defs>
+
+      <!-- (rotating streaks removed) -->
+
+      <!-- Wrap everything below in scaleY(0.85) so the lantern is 15% shorter.
+           translate(0 6) compensates so the handle ring (y=40) stays at y=40. -->
+      <g transform="translate(0 6) scale(1 0.85)">
+
+      <!-- Handle ring (the pivot) - 2x bigger -->
+      <g filter="url(#softGlow)">
+        <circle cx="200" cy="40" r="10" fill="none" stroke="url(#cap)" stroke-width="3"/>
+      </g>
+
+      <!-- Top cap (pentagon) -->
+      <g filter="url(#softGlow)">
+        <path d="M 130 95 L 200 70 L 270 95 L 260 115 L 140 115 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+        <line x1="200" y1="70" x2="200" y2="115" stroke="#b8f8ff" stroke-width="0.8" opacity="0.6"/>
+        <line x1="160" y1="105" x2="240" y2="105" stroke="#b8f8ff" stroke-width="0.6" opacity="0.5"/>
+      </g>
+
+      <!-- Chain link: from bottom of handle ring (y=50) to pentagon tip (y=70).
+           No filter so it stays sharp; double-stroked (thick base + thin bright core) for visibility. -->
+      <line x1="200" y1="50" x2="200" y2="70" stroke="#5ff5ff" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+      <line x1="200" y1="50" x2="200" y2="70" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+
+      <!-- Top lens cap -->
+      <ellipse cx="200" cy="120" rx="75" ry="10" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+
+      <!-- Lantern body (glass + frame + highlights) -->
+      <g filter="url(#softGlow)">
+        <path d="M 130 120
+                 C 125 200, 120 280, 135 380
+                 L 265 380
+                 C 280 280, 275 200, 270 120 Z"
+              fill="url(#lanternGlass)" stroke="url(#frame)" stroke-width="2.5"/>
+        <line x1="170" y1="125" x2="167" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="200" y1="125" x2="200" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="230" y1="125" x2="233" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+        <line x1="125" y1="190" x2="275" y2="190" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <line x1="122" y1="270" x2="278" y2="270" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <line x1="128" y1="340" x2="272" y2="340" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
+        <path d="M 150 140 Q 145 250, 155 360" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>
+        <path d="M 158 150 Q 153 250, 162 350" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>
+      </g>
+
+      <!-- FLAME — centered between original (x=140) and previous (x=30) = x=85.
+           Flame center in lantern coords: 85 + 100*1.2 = 205 (≈5px right of glass center 200). -->
+      <g transform="translate(85 215) scale(1.2)">
+        <!-- FLAME GROUP (upright) -->
+        <g filter="url(#globalBlur)">
+          <!-- 1. Outer flame base -->
+          <path d="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30" fill="#0088aa" opacity="0.6">
+            <animate attributeName="d" dur="2s" repeatCount="indefinite"
+              values="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30;
+                      M100,30 Q135,85 112,155 Q100,115 88,155 Q65,85 100,30;
+                      M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30"/>
+          </path>
+          <!-- 2. Middle flame layer -->
+          <path d="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50" fill="#00ccff" opacity="0.8">
+            <animate attributeName="d" dur="1.5s" repeatCount="indefinite"
+              values="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50;
+                      M100,50 Q125,95 108,145 Q100,120 92,145 Q75,95 100,50;
+                      M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50"/>
+          </path>
+          <!-- 3. Inner flame core (brightest) -->
+          <path d="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70" fill="#ffffff" opacity="0.9">
+            <animate attributeName="d" dur="1s" repeatCount="indefinite"
+              values="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70;
+                      M100,70 Q115,100 103,135 Q100,120 97,135 Q85,100 100,70;
+                      M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70"/>
+          </path>
+          <!-- 4. Plasma overlay -->
+          <path d="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60" fill="url(#coreGradient)" opacity="0.7">
+            <animate attributeName="d" dur="2.5s" repeatCount="indefinite"
+              values="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60;
+                      M100,60 Q130,105 105,165 Q100,125 95,165 Q70,105 100,60;
+                      M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60"/>
+          </path>
+        </g>
+      </g>
+
+      <!-- Bottom lens cap -->
+      <ellipse cx="200" cy="380" rx="68" ry="9" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+
+      <!-- Bottom cap (no tassel sphere) -->
+      <g filter="url(#softGlow)">
+        <path d="M 140 380 L 260 380 L 250 400 L 150 400 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+        <ellipse cx="200" cy="400" rx="50" ry="6" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1"/>
+      </g>
+
+      </g> <!-- end scaleY wrapper -->
+    </svg>
+  </div>
+
+  <script>
+    (function () {
+      const cursor = document.getElementById('lantern-cursor');
+      const halfW = 100, halfH = 125; // centered pivot at (halfW, halfH * 0.32)
+
+      // Pendulum state (angle in degrees)
+      let angle = 0;
+      let angVel = 0;
+      let lastX = window.innerWidth / 2;
+      let lastY = window.innerHeight / 2;
+      let lastT = performance.now();
+
+      // Real pendulum physics:
+      //   - Restoring force from gravity: weak, proportional to sin(angle) ~ angle
+      //   - Air resistance: small, proportional to velocity (NOT a global multiplier)
+      //   - Mass of lantern hangs below pivot => slow natural period
+      const restoring = 0.0035;    // weak gravity pull back to center
+      const airDrag   = 0.025;     // gentle velocity-proportional damping
+      const maxAngle  = 45;
+      const sensitivity = 0.9;     // mouse displacement -> angular impulse
+
+      function onMove(x, y, t) {
+        const dx = x - lastX;
+        const impulse = Math.max(-40, Math.min(40, dx * sensitivity));
+        angVel += impulse;
+        lastX = x; lastY = y; lastT = t;
+      }
+
+      function frame() {
+        // Gravity restoring force (weak, linear approximation of sin)
+        angVel += -angle * restoring;
+        // Air drag: lose a fraction of velocity per frame
+        angVel -= angVel * airDrag;
+        // Integrate
+        angle += angVel;
+
+        // Clamp + soft bounce
+        if (angle >  maxAngle) { angle =  maxAngle; angVel *= -0.35; }
+        if (angle < -maxAngle) { angle = -maxAngle; angVel *= -0.35; }
+
+        cursor.style.transform = `translate(${lastX - halfW}px, ${lastY - halfH * 0.32}px) rotate(${angle}deg)`;
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY, performance.now()), { passive: true });
+      window.addEventListener('touchmove', e => {
+        if (e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY, performance.now());
+      }, { passive: true });
+
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
