@@ -118,16 +118,16 @@ const createCursor = () => {
       <g transform="translate(60 170) scale(1.4)">
         <g filter="url(#globalBlur)">
           <path d="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30" fill="#0088aa" opacity="0.6">
-            <animate attributeName="d" dur="1.2s" repeatCount="indefinite" values="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30; M115,20 Q145,80 110,155 Q100,115 80,155 Q65,80 115,20; M85,25 Q120,85 115,145 Q100,105 90,145 Q55,85 85,25; M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30"/>
+            <animate attributeName="d" dur="2s" repeatCount="indefinite" values="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30; M100,30 Q135,85 112,155 Q100,115 88,155 Q65,85 100,30; M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30"/>
           </path>
           <path d="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50" fill="#00ccff" opacity="0.8">
-            <animate attributeName="d" dur="0.9s" repeatCount="indefinite" values="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50; M110,40 Q135,90 105,145 Q100,120 85,145 Q75,90 110,40; M90,45 Q115,95 110,135 Q100,110 95,135 Q65,95 90,45; M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50"/>
+            <animate attributeName="d" dur="1.5s" repeatCount="indefinite" values="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50; M100,50 Q125,95 108,145 Q100,120 92,145 Q75,95 100,50; M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50"/>
           </path>
           <path d="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70" fill="#ffffff" opacity="0.9">
-            <animate attributeName="d" dur="0.6s" repeatCount="indefinite" values="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70; M105,60 Q122,95 100,135 Q100,120 90,135 Q85,95 105,60; M95,65 Q108,100 105,125 Q100,110 98,125 Q80,100 95,65; M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70"/>
+            <animate attributeName="d" dur="1s" repeatCount="indefinite" values="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70; M100,70 Q115,100 103,135 Q100,120 97,135 Q85,100 100,70; M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70"/>
           </path>
           <path d="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60" fill="url(#coreGradient)" opacity="0.7">
-            <animate attributeName="d" dur="1.5s" repeatCount="indefinite" values="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60; M115,45 Q140,100 105,165 Q100,125 85,165 Q70,100 115,45; M85,50 Q115,105 108,155 Q100,115 95,155 Q60,105 85,50; M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60"/>
+            <animate attributeName="d" dur="2.5s" repeatCount="indefinite" values="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60; M100,60 Q130,105 105,165 Q100,125 95,165 Q70,105 100,60; M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60"/>
           </path>
         </g>
       </g>
@@ -317,18 +317,18 @@ function updateMouse(x, y) {
 
 document.addEventListener('mousemove', (e) => {
   hasMouseMoved = true;
-  updateMouse(e.clientX, e.clientY + 45); // offset to center of lantern
+  updateMouse(e.clientX, e.clientY + 25); // offset to center of lantern
 });
 document.addEventListener('touchmove', (e) => {
   if (e.touches.length > 0) {
     isTouching = true;
-    updateMouse(e.touches[0].clientX, e.touches[0].clientY + 45);
+    updateMouse(e.touches[0].clientX, e.touches[0].clientY + 25);
   }
 }, { passive: true });
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length > 0) {
     isTouching = true;
-    updateMouse(e.touches[0].clientX, e.touches[0].clientY + 45);
+    updateMouse(e.touches[0].clientX, e.touches[0].clientY + 25);
   }
 }, { passive: true });
 document.addEventListener('touchend', () => {
