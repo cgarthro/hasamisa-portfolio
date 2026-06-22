@@ -50,96 +50,150 @@ const createCursor = () => {
   const lantern = document.createElement('div');
   lantern.classList.add('cursor-lantern');
   lantern.innerHTML = `
-    <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 100px; overflow: visible;">
-      <defs>
-        <radialGradient id="lanternGlass" cx="50%" cy="50%" r="60%">
-          <stop offset="0%"  stop-color="#b8f8ff" stop-opacity="0.95"/>
-          <stop offset="50%" stop-color="#33e0ff" stop-opacity="0.55"/>
-          <stop offset="100%" stop-color="#0091a8" stop-opacity="0.35"/>
-        </radialGradient>
-        <linearGradient id="frame" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%"  stop-color="#5ff5ff"/>
-          <stop offset="100%" stop-color="#0a6b7a"/>
-        </linearGradient>
-        <linearGradient id="cap" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%"  stop-color="#9ffaff"/>
-          <stop offset="100%" stop-color="#1a8fa3"/>
-        </linearGradient>
-        <radialGradient id="fireCore" cx="50%" cy="65%" r="50%">
-          <stop offset="0%"  stop-color="#ffffff" stop-opacity="1"/>
-          <stop offset="25%" stop-color="#b8f8ff" stop-opacity="0.95"/>
-          <stop offset="60%" stop-color="#33e0ff" stop-opacity="0.7"/>
-          <stop offset="100%" stop-color="#006978" stop-opacity="0"/>
-        </radialGradient>
-
-        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="globalBlur">
-          <feGaussianBlur stdDeviation="1.5"/>
-        </filter>
-
-        <!-- Flame gradients -->
-        <radialGradient id="coreGradient" cx="50%" cy="30%" r="60%">
-          <stop offset="0%"  stop-color="#ffffff"/>
-          <stop offset="40%" stop-color="#00ffff"/>
-          <stop offset="100%" stop-color="#005577" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-
-      <g transform="translate(0 6) scale(1 0.85)">
-      <!-- Handle ring -->
-      <g filter="url(#softGlow)"><circle cx="200" cy="40" r="10" fill="none" stroke="url(#cap)" stroke-width="3"/></g>
-      <!-- Top cap -->
-      <g filter="url(#softGlow)">
-        <path d="M 130 95 L 200 70 L 270 95 L 260 115 L 140 115 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
-        <line x1="200" y1="70" x2="200" y2="115" stroke="#b8f8ff" stroke-width="0.8" opacity="0.6"/>
-        <line x1="160" y1="105" x2="240" y2="105" stroke="#b8f8ff" stroke-width="0.6" opacity="0.5"/>
-      </g>
-      <!-- Chain link -->
-      <line x1="200" y1="50" x2="200" y2="70" stroke="#5ff5ff" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
-      <line x1="200" y1="50" x2="200" y2="70" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
-      <!-- Top lens cap -->
-      <ellipse cx="200" cy="120" rx="75" ry="10" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
-      <!-- Lantern body -->
-      <g filter="url(#softGlow)">
-        <path d="M 130 120 C 125 200, 120 280, 135 380 L 265 380 C 280 280, 275 200, 270 120 Z" fill="url(#lanternGlass)" stroke="url(#frame)" stroke-width="2.5"/>
-        <line x1="170" y1="125" x2="167" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
-        <line x1="200" y1="125" x2="200" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
-        <line x1="230" y1="125" x2="233" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
-        <line x1="125" y1="190" x2="275" y2="190" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
-        <line x1="122" y1="270" x2="278" y2="270" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
-        <line x1="128" y1="340" x2="272" y2="340" stroke="url(#frame)" stroke-width="1" opacity="0.5"/>
-        <path d="M 150 140 Q 145 250, 155 360" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.35" stroke-linecap="round"/>
-        <path d="M 158 150 Q 153 250, 162 350" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>
-      </g>
-      <!-- FLAME -->
-      <g transform="translate(60 170) scale(1.4)">
-        <g filter="url(#globalBlur)">
-          <path d="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30" fill="#0088aa" opacity="0.6">
-            <animate attributeName="d" dur="2s" repeatCount="indefinite" values="M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30; M100,30 Q135,85 112,155 Q100,115 88,155 Q65,85 100,30; M100,30 Q130,90 115,150 Q100,110 85,150 Q70,90 100,30"/>
-          </path>
-          <path d="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50" fill="#00ccff" opacity="0.8">
-            <animate attributeName="d" dur="1.5s" repeatCount="indefinite" values="M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50; M100,50 Q125,95 108,145 Q100,120 92,145 Q75,95 100,50; M100,50 Q120,100 110,140 Q100,115 90,140 Q80,100 100,50"/>
-          </path>
-          <path d="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70" fill="#ffffff" opacity="0.9">
-            <animate attributeName="d" dur="1s" repeatCount="indefinite" values="M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70; M100,70 Q115,100 103,135 Q100,120 97,135 Q85,100 100,70; M100,70 Q112,105 105,130 Q100,115 95,130 Q88,105 100,70"/>
-          </path>
-          <path d="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60" fill="url(#coreGradient)" opacity="0.7">
-            <animate attributeName="d" dur="2.5s" repeatCount="indefinite" values="M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60; M100,60 Q130,105 105,165 Q100,125 95,165 Q70,105 100,60; M100,60 Q125,110 108,160 Q100,120 92,160 Q75,110 100,60"/>
-          </path>
-        </g>
-      </g>
-      <!-- Bottom lens cap -->
-      <ellipse cx="200" cy="380" rx="68" ry="9" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
-      <!-- Bottom cap -->
-      <g filter="url(#softGlow)">
-        <path d="M 140 380 L 260 380 L 250 400 L 150 400 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
-        <ellipse cx="200" cy="400" rx="50" ry="6" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1"/>
-      </g>
-      </g>
-    </svg>`;
+    <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 100px; overflow: visible;" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <radialGradient id="lanternGlass" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#b8f8ff" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#33e0ff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0091a8" stop-opacity="0.1"/>
+    </radialGradient>
+    <linearGradient id="frame" x1="0" y1="0" x2="0" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5ff5ff"/>
+      <stop offset="100%" stop-color="#0a6b7a"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9ffaff"/>
+      <stop offset="100%" stop-color="#1a8fa3"/>
+    </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="blur2">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <filter id="blur3">
+      <feGaussianBlur stdDeviation="1"/>
+    </filter>
+    <radialGradient id="coreGrad" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="#005577" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(0 6) scale(1 0.85)">
+<!--Handle ring-->
+    <g filter="url(#softGlow)">
+      <circle cx="200" cy="40" r="10" fill="none" stroke="url(#cap)" stroke-width="4"/>
+    </g>
+<!--Top cap-->
+    <g filter="url(#softGlow)">
+<!--Chain link-->
+      <line x1="200" y1="52" x2="200" y2="70" stroke="#5ff5ff" stroke-width="3" opacity="0.7"/>
+      <path d="M 130 95 L 200 70 L 270 95 L 260 115 L 140 115 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+      <line x1="200" y1="52" x2="200" y2="115" stroke="#b8f8ff" stroke-width="0.8" opacity="0.6"/>
+      <line x1="160" y1="105" x2="240" y2="105" stroke="#b8f8ff" stroke-width="0.6" opacity="0.5"/>
+    </g>
+<!--Top lens cap-->
+    <ellipse cx="200" cy="120" rx="75" ry="10" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+<!--Lantern body-->
+    <g filter="url(#softGlow)">
+      <path d="M 130 120 C 125 200, 120 280, 135 380 L 265 380 C 280 280, 275 200, 270 120 Z" fill="url(#lanternGlass)" stroke="url(#frame)" stroke-width="2.5"/>
+      <line x1="200" y1="129" x2="200" y2="378" stroke="url(#frame)" stroke-width="1.2" opacity="0.7"/>
+      <path d="M 150 140 Q 145 250, 155 360" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+      <path d="M 158 150 Q 153 250, 162 350" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.8" stroke-linecap="round"/>
+    </g>
+<!--FLAME-->
+    <g transform="translate(200 380) scale(0.5 -0.5)">
+<!--outermost layer - wide violent swings-->
+      <path fill="#03ecfc" opacity="0.3" filter="url(#blur1)" style="mix-blend-mode: plus-lighter;">
+        <animate attributeName="d" dur="0.7s" repeatCount="indefinite" values="
+              M0,0 Q-90,60 -70,160 Q-50,240 -20,310 Q-5,355 0,380 Q5,355 20,310 Q50,240 70,160 Q90,60 0,0;
+              M0,0 Q-110,50 -60,170 Q-30,260 -50,330 Q-15,365 0,390 Q15,365 50,330 Q30,260 60,170 Q110,50 0,0;
+              M0,0 Q-80,70 -80,155 Q-65,235 -10,320 Q0,360 0,375 Q0,360 10,320 Q65,235 80,155 Q80,70 0,0;
+              M0,0 Q-90,60 -70,160 Q-50,240 -20,310 Q-5,355 0,380 Q5,355 20,310 Q50,240 70,160 Q90,60 0,0
+            "/>
+      </path>
+<!--outer cyan body-->
+      <path fill="#0077aa" opacity="0.5" filter="url(#blur1)" style="mix-blend-mode: screen;">
+        <animate attributeName="d" dur="0.55s" repeatCount="indefinite" values="
+              M0,0 Q-70,50 -55,140 Q-40,210 -10,280 Q0,320 0,350 Q0,320 10,280 Q40,210 55,140 Q70,50 0,0;
+              M0,0 Q-85,45 -45,155 Q-15,230 -35,295 Q-10,330 0,355 Q10,330 35,295 Q15,230 45,155 Q85,45 0,0;
+              M0,0 Q-60,60 -65,138 Q-55,205 -5,285 Q3,318 0,345 Q-3,318 5,285 Q55,205 65,138 Q60,60 0,0;
+              M0,0 Q-70,50 -55,140 Q-40,210 -10,280 Q0,320 0,350 Q0,320 10,280 Q40,210 55,140 Q70,50 0,0
+            "/>
+      </path>
+<!--mid bright body-->
+      <path fill="#00ccff" opacity="0.85" filter="url(#blur2)">
+        <animate attributeName="d" dur="0.45s" repeatCount="indefinite" values="
+              M0,0 Q-50,55 -40,130 Q-25,195 -5,255 Q0,285 0,310 Q0,285 5,255 Q25,195 40,130 Q50,55 0,0;
+              M0,0 Q-65,48 -28,142 Q-5,208 -22,268 Q-6,292 0,315 Q6,292 22,268 Q5,208 28,142 Q65,48 0,0;
+              M0,0 Q-42,62 -48,128 Q-38,190 -2,260 Q2,282 0,305 Q-2,282 2,260 Q38,190 48,128 Q42,62 0,0;
+              M0,0 Q-50,55 -40,130 Q-25,195 -5,255 Q0,285 0,310 Q0,285 5,255 Q25,195 40,130 Q50,55 0,0
+            "/>
+      </path>
+<!--left side tongue - rogue-->
+      <path fill="#2edcff" opacity="1" filter="url(#blur1)" style="mix-blend-mode: plus-lighter;">
+        <animate attributeName="d" dur="0.4s" repeatCount="indefinite" values="
+              M0,0 Q-60,40 -55,110 Q-50,160 -30,220 Q-15,250 0,0;
+              M0,0 Q-75,35 -40,125 Q-25,175 -45,235 Q-20,260 0,0;
+              M0,0 Q-55,50 -62,105 Q-60,150 -20,215 Q-8,245 0,0;
+              M0,0 Q-60,40 -55,110 Q-50,160 -30,220 Q-15,250 0,0
+            "/>
+      </path>
+<!--right side tongue - rogue-->
+      <path fill="#2edcff" opacity="1" filter="url(#blur1)" style="mix-blend-mode: plus-lighter;">
+        <animate attributeName="d" dur="0.48s" repeatCount="indefinite" values="
+              M0,0 Q60,40 55,110 Q50,160 30,220 Q15,250 0,0;
+              M0,0 Q72,38 38,128 Q22,178 42,238 Q18,262 0,0;
+              M0,0 Q52,52 60,108 Q58,152 18,218 Q6,248 0,0;
+              M0,0 Q60,40 55,110 Q50,160 30,220 Q15,250 0,0
+            "/>
+      </path>
+<!--inner white-hot core-->
+      <path fill="#00b7c4" opacity="0.9" filter="url(#blur2)">
+        <animate attributeName="d" dur="0.35s" repeatCount="indefinite" values="
+              M0,0 Q-22,60 -18,120 Q-10,175 0,215 Q10,175 18,120 Q22,60 0,0;
+              M0,0 Q-30,55 -12,128 Q-2,180 0,222 Q2,180 12,128 Q30,55 0,0;
+              M0,0 Q-18,65 -22,118 Q-14,172 0,210 Q14,172 22,118 Q18,65 0,0;
+              M0,0 Q-22,60 -18,120 Q-10,175 0,215 Q10,175 18,120 Q22,60 0,0
+            "/>
+      </path>
+<!--pure white tip-->
+      <path fill="#ffffff" opacity="1" filter="url(#blur)">
+        <animate attributeName="d" dur="0.28s" repeatCount="indefinite" values="
+              M0,0 Q-8,55 0,110 Q8,55 0,0;
+              M0,0 Q-14,50 0,118 Q14,50 0,0;
+              M0,0 Q-6,60 0,105 Q6,60 0,0;
+              M0,0 Q-8,55 0,110 Q8,55 0,0
+            "/>
+      </path>
+<!--gradient core overlay-->
+      <path fill="url(#coreGrad)" opacity="0.5" filter="url(#blur3)">
+        <animate attributeName="d" dur="0.6s" repeatCount="indefinite" values="
+              M0,0 Q-35,65 -28,145 Q-15,210 0,260 Q15,210 28,145 Q35,65 0,0;
+              M0,0 Q-44,58 -18,152 Q-4,215 0,268 Q4,215 18,152 Q44,58 0,0;
+              M0,0 Q-28,70 -34,142 Q-22,205 0,255 Q22,205 34,142 Q28,70 0,0;
+              M0,0 Q-35,65 -28,145 Q-15,210 0,260 Q15,210 28,145 Q35,65 0,0
+            "/>
+      </path>
+    </g>
+<!--Bottom lens cap-->
+    <ellipse cx="200" cy="380" rx="68" ry="9" fill="url(#frame)" stroke="#b8f8ff" stroke-width="1.2"/>
+<!--Bottom cap-->
+    <g filter="url(#softGlow)">
+      <path d="M 140 380 L 260 380 L 250 400 L 150 400 Z" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1" opacity="0.95"/>
+      <ellipse cx="200" cy="400" rx="50" ry="6" fill="url(#cap)" stroke="#b8f8ff" stroke-width="1"/>
+    </g>
+  </g>
+</svg>
+`;
   cursor.appendChild(lantern);
 
   // The hover lens element (hidden by default)
@@ -1923,3 +1977,4 @@ window.renderProjectPage = async (projectId) => {
     console.error('Error loading project HTML:', err);
   }
 };
+
